@@ -1,11 +1,17 @@
-cmake_minimum_required(VERSION 3.20)
-project(Disruptor CXX)
+project(Disruptor)
+cmake_minimum_required(VERSION 2.6)
 
-# Find Boost, required components
-find_package(Boost REQUIRED COMPONENTS system thread chrono)
+find_package(Boost COMPONENTS system thread chrono)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+endif()
 
-# Source files
+include_directories("..")
+
+
 set(Disruptor_sources
+
     BasicExecutor.cpp
     BlockingWaitStrategy.cpp
     BusySpinWaitStrategy.cpp
@@ -29,8 +35,8 @@ set(Disruptor_sources
     YieldingWaitStrategy.cpp
 )
 
-# Header files
 set(Disruptor_headers
+
     AggregateEventHandler.h
     AlertException.h
     ArgumentException.h
@@ -110,34 +116,17 @@ set(Disruptor_headers
 )
 
 add_library(DisruptorShared SHARED ${Disruptor_sources})
-
-# Use modern target property commands
-target_include_directories(DisruptorShared PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
-
-# ???
-target_include_directories(DisruptorShared PRIVATE ${Boost_INCLUDE_DIRS})
-message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
-
-# Link Boost components using imported targets
-target_link_libraries(DisruptorShared PRIVATE Boost::system Boost::thread Boost::chrono)
-
-set_target_properties(DisruptorShared PROPERTIES
-    OUTPUT_NAME Disruptor
-    VERSION ${DISRUPTOR_VERSION}
-    SOVERSION ${DISRUPTOR_VERSION_MAJOR}
-)
+target_link_libraries(DisruptorShared ${Boost_LIBRARIES})
+set_target_properties(DisruptorShared PROPERTIES OUTPUT_NAME Disruptor)
+set_target_properties(DisruptorShared PROPERTIES VERSION ${DISRUPTOR_VERSION})
+set_target_properties(DisruptorShared PROPERTIES SOVERSION ${DISRUPTOR_VERSION_MAJOR})
 
 add_library(DisruptorStatic STATIC ${Disruptor_sources})
-target_include_directories(DisruptorStatic PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
-##
-target_include_directories(DisruptorStatic PRIVATE ${Boost_INCLUDE_DIRS})
-
 set_target_properties(DisruptorStatic PROPERTIES OUTPUT_NAME Disruptor)
 
-# Installation rules
+install(FILES ${Disruptor_headers} DESTINATION include/Disruptor)
+
 install(TARGETS DisruptorShared DisruptorStatic
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
-
-install(FILES ${Disruptor_headers} DESTINATION include/Disruptor)

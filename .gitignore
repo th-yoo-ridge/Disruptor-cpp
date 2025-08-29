@@ -1,5 +1,50 @@
 obj/
 bin/
 lib/
+
+# VS and VSCode
+.vs
+.vscode/settings.json
+
+# CMake
 build/
-.vs/
+out/
+/*/CMakeUserPresets.json
+
+# vcpkg
+vcpkg_installed*/
+
+# Visual Studio built-in CMake configuration
+/CMakeSettings.json
+# CLion project configuration
+/.idea
+/cmake-build*
+# Coding assistants' stuff
+/CLAUDE.md
+/.claude/
+/GEMINI.md
+/.gemini/
+
+#------------------------------------------------------------------------------
+#
+# VIM
+#
+#------------------------------------------------------------------------------
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+
+# Persistent undo
+[._]*.un~
