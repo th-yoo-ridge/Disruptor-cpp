@@ -39,3 +39,24 @@ set(DISRUPTOR_VERSION "${DISRUPTOR_VERSION_MAJOR}.${DISRUPTOR_VERSION_MINOR}.${D
 #set(MY_OPT_FLAGS "" CACHE STRING "Custom optimization flags for Release builds, e.g., -Ofast -march=native")
 
 add_subdirectory(Disruptor)
+
+if(DISRUPTOR_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(googletest-release-1.8.0)
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+    add_subdirectory(Disruptor.PerfTests)
+    add_subdirectory(Disruptor.TestTools)
+    add_subdirectory(Disruptor.Tests)
+endif()
+
+# Google Test 
+#    enable_testing()
+#    
+#    find_package(GTest CONFIG REQUIRED)
+#    target_link_libraries(main PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+#    
+#    add_test(AllTestsInMain main)
+
+
+

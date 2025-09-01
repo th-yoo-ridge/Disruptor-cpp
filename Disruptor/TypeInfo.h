@@ -50,7 +50,8 @@ namespace std
 {
 
     template <>
-    struct hash< Disruptor::TypeInfo > : public unary_function< Disruptor::TypeInfo, size_t >
+    // unary_function is removed in C++17
+    struct hash< Disruptor::TypeInfo >
     {
     public:
         size_t operator()(const Disruptor::TypeInfo& value) const

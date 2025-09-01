@@ -2,10 +2,12 @@
 	"version": 5,
 	"configurePresets": [
 		{
-			"name": "vcpkg",
+			"name": "test",
 			"generator": "Ninja",
 			"binaryDir": "${sourceDir}/build/${presetName}",
 			"cacheVariables": {
+				"CMAKE_POLICY_VERSION_MINIMUM": "3.5",
+				"DISRUPTOR_BUILD_TESTS": "ON",
 				"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
 				"CMAKE_BUILD_TYPE": "Release"
 			}
