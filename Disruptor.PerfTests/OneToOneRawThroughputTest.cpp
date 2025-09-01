@@ -64,7 +64,7 @@ namespace PerfTests
         }
     }
 
-    OneToOneRawThroughputTest::MyRunnable::MyRunnable(const std::shared_ptr< ISequencer< boost::any > >& sequencer)
+    OneToOneRawThroughputTest::MyRunnable::MyRunnable(const std::shared_ptr< ISequencer< std::any > >& sequencer)
     {
         m_barrier = sequencer->newBarrier({});
     }

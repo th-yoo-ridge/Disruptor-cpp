@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
+#include <string>
+#include <algorithm>
+#include <cctype>
 
 #include "LatencyTestSession.h"
 #include "TestRepository.h"
@@ -10,6 +13,28 @@ using namespace Disruptor::PerfTests;
 
 void runAllTests(const TestRepository& testRepository);
 void runOneTest(const TestRepository& testRepository, const std::string& testName);
+
+static void trim(std::string& s)
+{
+    // Left trim
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+    // Right trim
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// Case-insensitive equality
+static bool iequals(const std::string& a, const std::string& b)
+{
+    return std::equal(a.begin(), a.end(),
+                      b.begin(), b.end(),
+                      [](unsigned char c1, unsigned char c2) {
+                          return std::tolower(c1) == std::tolower(c2);
+                      });
+}
 
 int main(int, char**)
 {
@@ -21,9 +46,9 @@ int main(int, char**)
 
     std::getline(std::cin, testName);
 
-    boost::algorithm::trim(testName);
+    trim(testName);  // replaces boost::algorithm::trim
 
-    if (boost::algorithm::iequals(testName, "ALL") || testName.empty())
+    if (iequals(testName, "ALL") || testName.empty())  // replaces boost::algorithm::iequals
     {
         runAllTests(testRepository);
     }
@@ -34,6 +59,24 @@ int main(int, char**)
 
     return 0;
 }
+
+// int main(int, char**)
+// {
+//     auto& testRepository = TestRepository::instance();
+//     std::string testName;
+//     std::cout << "Test name (ALL by default):  " << testName << " ?" << std::endl;
+//     std::getline(std::cin, testName);
+//     boost::algorithm::trim(testName);
+//     if (boost::algorithm::iequals(testName, "ALL") || testName.empty())
+//     {
+//         runAllTests(testRepository);
+//     }
+//     else
+//     {
+//         runOneTest(testRepository, testName);
+//     }
+//     return 0;
+// }
 
 void runAllTests(const TestRepository& testRepository)
 {

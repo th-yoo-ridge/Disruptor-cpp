@@ -30,7 +30,7 @@ namespace PerfTests
                 << " <tr>" << std::endl
                 << "     <td>" << runId << "</td>" << std::endl
                 << "     <td>FAILED</td>" << std::endl
-                << "     <td>" << m_exception.get().what() << "</td>" << std::endl
+                << "     <td>" << m_exception.value().what() << "</td>" << std::endl
                 << "</tr>" << std::endl;
         }
         else
@@ -50,7 +50,7 @@ namespace PerfTests
         result.imbue(std::locale(result.getloc(), new Tests::HumanNumberFacet()));
 
         if (m_exception)
-            result << "Run: FAILED: " << m_exception.get().what();
+            result << "Run: FAILED: " << m_exception.value().what();
         else
         {
             auto humanDuration = Tests::DurationHumanizer::deduceHumanDuration(duration());

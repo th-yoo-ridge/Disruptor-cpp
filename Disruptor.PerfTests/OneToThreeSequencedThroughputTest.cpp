@@ -52,7 +52,7 @@ namespace PerfTests
         m_taskScheduler->start(requiredProcessorCount());
         TestTools::ScopeExitFunctor atScopeExit([this] { m_taskScheduler->stop(); });
 
-        auto latch = std::make_shared< boost::barrier >(m_numEventProcessors + 1);
+        auto latch = std::make_shared< std::barrier<> >(m_numEventProcessors + 1);
 
         std::vector< std::future< void > > processorTasks;
         for (auto i = 0; i < m_numEventProcessors; ++i)
@@ -72,7 +72,7 @@ namespace PerfTests
             rb.publish(sequence);
         }
 
-        latch->wait();
+        latch->arrive_and_wait();
         stopwatch.stop();
 
         for (auto i = 0; i < m_numEventProcessors; ++i)

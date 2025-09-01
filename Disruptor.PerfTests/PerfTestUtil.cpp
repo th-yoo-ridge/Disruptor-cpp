@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "PerfTestUtil.h"
 
-#include <boost/date_time.hpp>
+#include <chrono>
+#include <format>
+#include <string>
 
 #include "Disruptor/IEventProcessor.h"
 #include "Disruptor/ISequence.h"
@@ -49,10 +51,16 @@ namespace PerfTestUtil
         }
     }
 
+    // std::string utcDateToString()
+    // {
+    //     auto t(boost::posix_time::second_clock::universal_time());
+    //     return to_simple_string(t);
+    // }
     std::string utcDateToString()
     {
-        auto t(boost::posix_time::second_clock::universal_time());
-        return to_simple_string(t);
+        using namespace std::chrono;
+        auto now = utc_clock::now(); // current UTC time_point
+        return std::format("{:%F %T}", now); // format directly
     }
 
 } // namespace PerfTestUtil

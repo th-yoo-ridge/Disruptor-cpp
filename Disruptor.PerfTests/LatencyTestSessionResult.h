@@ -4,7 +4,7 @@
 #include <exception>
 #include <iosfwd>
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "Disruptor/ClockConfig.h"
 #include "Disruptor.TestTools/LatencyRecorder.h"
@@ -29,7 +29,7 @@ namespace PerfTests
     private:
         std::shared_ptr< Tests::LatencyRecorder > m_latencyRecorder;
         ClockConfig::Duration m_duration;
-        boost::optional< std::exception > m_exception;
+        std::optional< std::exception > m_exception;
     };
 
 } // namespace PerfTests

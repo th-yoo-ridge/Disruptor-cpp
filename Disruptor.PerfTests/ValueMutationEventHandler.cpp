@@ -17,7 +17,7 @@ namespace PerfTests
         return m_value.value;
     }
 
-    void ValueMutationEventHandler::reset(const std::shared_ptr< boost::barrier >& latch, std::int64_t expectedCount)
+    void ValueMutationEventHandler::reset(const std::shared_ptr< std::barrier<> >& latch, std::int64_t expectedCount)
     {
         m_value.value = 0L;
         m_latch = latch;
@@ -30,7 +30,7 @@ namespace PerfTests
 
         if (sequence == m_iterations)
         {
-            m_latch->wait();
+            m_latch->arrive_and_wait();
         }
     }
 

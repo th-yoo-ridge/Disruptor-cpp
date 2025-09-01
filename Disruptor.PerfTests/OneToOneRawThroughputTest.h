@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/any.hpp>
+#include <any>
 
 #include "Disruptor/ISequencer.h"
 #include "Disruptor/RoundRobinThreadAffinedTaskScheduler.h"
@@ -78,7 +78,7 @@ namespace PerfTests
         const std::int64_t m_iterations = 1000L * 1000L * 200L;
 //#endif
 
-        std::shared_ptr< ISequencer< boost::any > > m_sequencer = std::make_shared< SingleProducerSequencer< boost::any > >(m_bufferSize, std::make_shared< YieldingWaitStrategy >());
+        std::shared_ptr< ISequencer< std::any > > m_sequencer = std::make_shared< SingleProducerSequencer< std::any > >(m_bufferSize, std::make_shared< YieldingWaitStrategy >());
         std::shared_ptr< MyRunnable > m_myRunnable;
         std::shared_ptr< RoundRobinThreadAffinedTaskScheduler > m_taskScheduler;
     };
@@ -87,7 +87,7 @@ namespace PerfTests
     class OneToOneRawThroughputTest::MyRunnable
     {
     public:
-        explicit MyRunnable(const std::shared_ptr< ISequencer< boost::any > >& sequencer);
+        explicit MyRunnable(const std::shared_ptr< ISequencer< std::any > >& sequencer);
 
         void reset(const std::shared_ptr< Tests::ManualResetEvent >& latch, std::int64_t expectedCount);
 
