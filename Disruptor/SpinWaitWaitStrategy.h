@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/thread.hpp>
-
 #include "Disruptor/IWaitStrategy.h"
 
 

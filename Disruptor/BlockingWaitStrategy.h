@@ -1,6 +1,7 @@
 #pragma once
 
-#include <boost/thread.hpp>
+#include <mutex>
+#include <condition_variable>
 
 #include "Disruptor/IWaitStrategy.h"
 
@@ -31,8 +32,8 @@ namespace Disruptor
         void writeDescriptionTo(std::ostream& stream) const override;
 
     private:
-        boost::recursive_mutex m_gate;
-        boost::condition_variable_any m_conditionVariable;
+        std::recursive_mutex m_gate;
+        std::condition_variable_any m_conditionVariable;
     };
 
 } // namespace Disruptor

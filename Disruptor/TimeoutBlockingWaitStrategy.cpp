@@ -2,8 +2,7 @@
 #include "TimeoutBlockingWaitStrategy.h"
 
 #include <ostream>
-
-#include <boost/chrono.hpp>
+#include <chrono>
 
 #include "ISequenceBarrier.h"
 #include "Sequence.h"
@@ -18,23 +17,55 @@ namespace Disruptor
     {
     }
 
-     std::int64_t TimeoutBlockingWaitStrategy::waitFor(std::int64_t sequence,
-                                                       Sequence& cursor,
-                                                       ISequence& dependentSequence,
-                                                       ISequenceBarrier& barrier)
+    //  std::int64_t TimeoutBlockingWaitStrategy::waitFor(std::int64_t sequence,
+    //                                                    Sequence& cursor,
+    //                                                    ISequence& dependentSequence,
+    //                                                    ISequenceBarrier& barrier)
+    // {
+    //     auto timeSpan = boost::chrono::microseconds(std::chrono::duration_cast< std::chrono::microseconds >(m_timeout).count());
+
+    //     if (cursor.value() < sequence)
+    //     {
+    //         boost::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
+
+    //         while (cursor.value() < sequence)
+    //         {
+    //             barrier.checkAlert();
+
+    //             if (m_conditionVariable.wait_for(uniqueLock, timeSpan) == boost::cv_status::timeout)
+    //                 DISRUPTOR_THROW_TIMEOUT_EXCEPTION();
+    //         }
+    //     }
+
+    //     std::int64_t availableSequence;
+    //     while ((availableSequence = dependentSequence.value()) < sequence)
+    //     {
+    //         barrier.checkAlert();
+    //     }
+
+    //     return availableSequence;
+    // }
+    std::int64_t TimeoutBlockingWaitStrategy::waitFor(std::int64_t sequence,
+                                                      Sequence& cursor,
+                                                      ISequence& dependentSequence,
+                                                      ISequenceBarrier& barrier)
     {
-        auto timeSpan = boost::chrono::microseconds(std::chrono::duration_cast< std::chrono::microseconds >(m_timeout).count());
+        using namespace std::chrono;
+
+        auto timeSpan = duration_cast<microseconds>(m_timeout);
 
         if (cursor.value() < sequence)
         {
-            boost::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
+            std::unique_lock<decltype(m_gate)> uniqueLock(m_gate);
 
             while (cursor.value() < sequence)
             {
                 barrier.checkAlert();
 
-                if (m_conditionVariable.wait_for(uniqueLock, timeSpan) == boost::cv_status::timeout)
+                if (m_conditionVariable.wait_for(uniqueLock, timeSpan) == std::cv_status::timeout)
+                {
                     DISRUPTOR_THROW_TIMEOUT_EXCEPTION();
+                }
             }
         }
 
@@ -49,7 +80,7 @@ namespace Disruptor
 
     void TimeoutBlockingWaitStrategy::signalAllWhenBlocking()
     {
-        boost::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
+        std::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
 
         m_conditionVariable.notify_all();
     }

@@ -10,6 +10,31 @@
 namespace Disruptor
 {
 
+    // std::int64_t BlockingWaitStrategy::waitFor(std::int64_t sequence,
+    //                                            Sequence& cursor,
+    //                                            ISequence& dependentSequence,
+    //                                            ISequenceBarrier& barrier)
+    // {
+    //     if (cursor.value() < sequence)
+    //     {
+    //         boost::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
+
+    //         while (cursor.value() < sequence)
+    //         {
+    //             barrier.checkAlert();
+
+    //             m_conditionVariable.wait(uniqueLock);
+    //         }
+    //     }
+
+    //     std::int64_t availableSequence;
+    //     while ((availableSequence = dependentSequence.value()) < sequence)
+    //     {
+    //         barrier.checkAlert();
+    //     }
+
+    //     return availableSequence;
+    // }
     std::int64_t BlockingWaitStrategy::waitFor(std::int64_t sequence,
                                                Sequence& cursor,
                                                ISequence& dependentSequence,
@@ -17,7 +42,7 @@ namespace Disruptor
     {
         if (cursor.value() < sequence)
         {
-            boost::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
+            std::unique_lock<decltype(m_gate)> uniqueLock(m_gate);
 
             while (cursor.value() < sequence)
             {
@@ -36,9 +61,10 @@ namespace Disruptor
         return availableSequence;
     }
 
+
     void BlockingWaitStrategy::signalAllWhenBlocking()
     {
-        boost::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
+        std::unique_lock< decltype(m_gate) > uniqueLock(m_gate);
 
         m_conditionVariable.notify_all();
     }

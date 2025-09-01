@@ -3,7 +3,10 @@
 
 #include <regex>
 #include <vector>
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
+#include <string>
+#include <sstream>
+#include <iterator>
 
 #if defined(__GNUC__)
 # include <cxxabi.h>
@@ -40,23 +43,47 @@ namespace Disruptor
         return intrinsicTypeInfo() == rhs.intrinsicTypeInfo();
     }
 
+    // std::string TypeInfo::dotNetify(const std::string& typeName)
+    // {
+    //     return boost::algorithm::replace_all_copy(typeName, "::", ".");
+    // }
     std::string TypeInfo::dotNetify(const std::string& typeName)
     {
-        return boost::algorithm::replace_all_copy(typeName, "::", ".");
+        std::string result = typeName;
+        std::string::size_type pos = 0;
+
+        while ((pos = result.find("::", pos)) != std::string::npos)
+        {
+            result.replace(pos, 2, ".");
+            pos += 1; // advance to avoid infinite loop
+        }
+
+        return result;
     }
 
+    // std::string TypeInfo::unqualifyName(const std::string& fullyQualifiedName)
+    // {
+    //     if (fullyQualifiedName.empty())
+    //         return std::string();
+
+    //     std::vector< std::string > nameParts;
+    //     boost::split(nameParts, fullyQualifiedName, boost::is_any_of("."));
+
+    //     if (nameParts.empty())
+    //         return std::string();
+
+    //     return nameParts[nameParts.size() - 1];
+    // }
     std::string TypeInfo::unqualifyName(const std::string& fullyQualifiedName)
     {
         if (fullyQualifiedName.empty())
-            return std::string();
+            return {};
 
-        std::vector< std::string > nameParts;
-        boost::split(nameParts, fullyQualifiedName, boost::is_any_of("."));
+        auto lastDot = fullyQualifiedName.rfind('.');
+        if (lastDot == std::string::npos)
+            return fullyQualifiedName;
 
-        if (nameParts.empty())
-            return std::string();
-
-        return nameParts[nameParts.size() - 1];
+        return fullyQualifiedName.substr(lastDot + 1);
     }
 
     std::string TypeInfo::demangleTypeName(const std::string& typeName)

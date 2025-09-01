@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/config.hpp>
+//#include <boost/config.hpp>
 
 // detect current compiler
 #if defined(BOOST_MSVC)
