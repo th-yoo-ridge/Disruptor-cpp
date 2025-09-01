@@ -6,7 +6,7 @@
 #include <ostream>
 #include <vector>
 
-#include <boost/any.hpp>
+#include <any>
 #include <boost/test/unit_test.hpp>
 
 #include "Disruptor/IEventTranslator.h"
@@ -37,64 +37,64 @@ namespace Tests
 
         void assertHandleResetAndNotWrap(const std::shared_ptr< RingBuffer< StubEvent > >& rb);
 
-        static void assertEmptyRingBuffer(const RingBuffer< boost::any >& ringBuffer);
+        static void assertEmptyRingBuffer(const RingBuffer< std::any >& ringBuffer);
 
 
         class RingBufferEquals
         {
         public:
-            RingBufferEquals(const std::initializer_list< boost::any >& values);
+            RingBufferEquals(const std::initializer_list< std::any >& values);
 
-            bool operator==(const RingBuffer< boost::any >& ringBuffer) const;
+            bool operator==(const RingBuffer< std::any >& ringBuffer) const;
 
             void writeDescriptionTo(std::ostream& stream) const;
 
         private:
             // http://stackoverflow.com/questions/6029092/compare-boostany-contents
-            static bool anyEqual(const boost::any& lhs, const boost::any& rhs);
+            static bool anyEqual(const std::any& lhs, const std::any& rhs);
 
-            static std::string anyToString(const boost::any& value);
+            static std::string anyToString(const std::any& value);
 
-            std::vector< boost::any > m_values;
+            std::vector< std::any > m_values;
         };
 
 
         std::shared_ptr< RingBuffer< StubEvent > > m_ringBuffer;
         std::shared_ptr< ISequenceBarrier > m_sequenceBarrier;
 
-        std::function< RingBufferEquals(const boost::any&, const boost::any&) > m_ringBufferWithEvents =
-            [](const boost::any& l1, const boost::any& l2) { return RingBufferEquals({ l1, l2 }); };
+        std::function< RingBufferEquals(const std::any&, const std::any&) > m_ringBufferWithEvents =
+            [](const std::any& l1, const std::any& l2) { return RingBufferEquals({ l1, l2 }); };
 
-        std::function< RingBufferEquals(const boost::any&, const boost::any&, const boost::any&, const boost::any&) > m_ringBufferWithEvents4 =
-            [](const boost::any& l1, const boost::any& l2, const boost::any& l3, const boost::any& l4) { return RingBufferEquals({ l1, l2, l3, l4 }); };
+        std::function< RingBufferEquals(const std::any&, const std::any&, const std::any&, const std::any&) > m_ringBufferWithEvents4 =
+            [](const std::any& l1, const std::any& l2, const std::any& l3, const std::any& l4) { return RingBufferEquals({ l1, l2, l3, l4 }); };
     };
 
 
-    class RingBufferTestsFixture::NoArgEventTranslator : public IEventTranslator< boost::any >
+    class RingBufferTestsFixture::NoArgEventTranslator : public IEventTranslator< std::any >
     {
     public:
-        void translateTo(boost::any& eventData, std::int64_t sequence) override;
+        void translateTo(std::any& eventData, std::int64_t sequence) override;
     };
 
 
-    class RingBufferTestsFixture::ThreeArgEventTranslator : public IEventTranslatorVararg< boost::any, std::string, std::string, std::string >
+    class RingBufferTestsFixture::ThreeArgEventTranslator : public IEventTranslatorVararg< std::any, std::string, std::string, std::string >
     {
     public:
-        void translateTo(boost::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1, const std::string& arg2) override;
+        void translateTo(std::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1, const std::string& arg2) override;
     };
     
     
-    class RingBufferTestsFixture::TwoArgEventTranslator : public IEventTranslatorVararg< boost::any, std::string, std::string >
+    class RingBufferTestsFixture::TwoArgEventTranslator : public IEventTranslatorVararg< std::any, std::string, std::string >
     {
     public:
-        void translateTo(boost::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1) override;
+        void translateTo(std::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1) override;
     };
     
     
-    class RingBufferTestsFixture::OneArgEventTranslator : public IEventTranslatorVararg< boost::any, std::string >
+    class RingBufferTestsFixture::OneArgEventTranslator : public IEventTranslatorVararg< std::any, std::string >
     {
     public:
-        void translateTo(boost::any& eventData, std::int64_t sequence, const std::string& arg0) override;
+        void translateTo(std::any& eventData, std::int64_t sequence, const std::string& arg0) override;
     };
     
     

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include <boost/any.hpp>
+#include <any>
 
 #include "Disruptor/Disruptor.h"
 

@@ -8,7 +8,7 @@ namespace Tests
 {
 
     DelayedEventHandler::DelayedEventHandler() 
-       : DelayedEventHandler(std::make_shared< boost::barrier >(2))
+       : DelayedEventHandler(std::make_shared< std::barrier<> >(2))
     {}
 
     void DelayedEventHandler::onEvent(TestEvent& /*data*/, std::int64_t /*sequence*/, bool /*endOfBatch*/)
@@ -30,7 +30,7 @@ namespace Tests
     {
         try
         {
-            m_barrier->wait();
+            m_barrier->arrive_and_wait();
         }
         catch (std::exception& ex)
         {
@@ -44,10 +44,10 @@ namespace Tests
 
     void DelayedEventHandler::awaitStart()
     {
-        m_barrier->wait();
+        m_barrier->arrive_and_wait();
     }
 
-    DelayedEventHandler::DelayedEventHandler(const std::shared_ptr< boost::barrier >& barrier)
+    DelayedEventHandler::DelayedEventHandler(const std::shared_ptr< std::barrier<> >& barrier)
         : m_readyToProcessEvent(0)
         , m_stopped(false)
         , m_barrier(barrier)

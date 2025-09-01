@@ -131,15 +131,19 @@ namespace Tests
         return *m_lastPublishedEvent;
     }
 
+    // FIXME: use exception_ptr instead exception
     std::exception DisruptorFixture::waitFor(const std::shared_ptr< AtomicReference< std::exception > >& reference)
     {
-        while (!reference->read())
+        std::optional<std::exception> optEx;
+        do
         {
+            optEx = reference->read();
             std::this_thread::yield();
-        }
+        } while (!optEx.has_value());
 
-        return reference->read().get();
+        return *optEx;  // return by value, slicing derived types if any
     }
+
 
     std::shared_ptr< DelayedEventHandler > DisruptorFixture::createDelayedEventHandler()
     {

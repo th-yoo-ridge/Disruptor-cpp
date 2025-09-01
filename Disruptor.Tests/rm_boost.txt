@@ -1,0 +1,77 @@
+BOOST TEST
+BatchingTests.cpp:#include <boost/mpl/vector.hpp>
+BatchingTests.cpp:typedef boost::mpl::vector
+
+
+DisruptorTests.cpp:#include <boost/any.hpp>
+
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(0, 1, boost::any(), boost::any()), *ringBuffer);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), boost::any(), boost::any()), *ringBuffer);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo0Bar0-0"), std::string("Foo2Bar2-1"), boost::any(), boost::any()), *ringBuffer);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), boost::any(), boost::any()), *ringBuffer);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+RingBufferTests.cpp:    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 16);
+
+RingBufferTestsFixture.h:#include <boost/test/unit_test.hpp>
+
+SequencerTests.cpp:#include <boost/mpl/vector.hpp>
+SequencerTests.cpp:typedef boost::mpl::vector< MultiProducerSequencer< int >, SingleProducerSequencer< int > > Sequencers;
+
+
+
+main.cpp:#include <boost/test/unit_test.hpp>
+main.cpp:#include <boost/test/results_reporter.hpp>
+main.cpp:        boost::unit_test::unit_test_log.set_threshold_level(boost::unit_test::log_test_units);
+main.cpp:        boost::unit_test::results_reporter::set_level(boost::unit_test::SHORT_REPORT);
+main.cpp:        testing::InitGoogleMock(&boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+
+stdafx.h:#include <boost/config.hpp>
+stdafx.h:#include <boost/test/results_reporter.hpp>
+stdafx.h:#include <boost/test/unit_test.hpp>

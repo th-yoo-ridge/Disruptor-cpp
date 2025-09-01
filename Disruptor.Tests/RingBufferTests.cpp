@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(ShouldPreventProducersOvertakingEventProcessorsWrapPoint)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEvent)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
 
     ringBuffer->publishEvent(translator);
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEvent)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventOneArg)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
     
     ringBuffer->publishEvent(translator, std::string("Foo"));
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventOneArg)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventTwoArg)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvent(translator, std::string("Foo"), std::string("Bar"));
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventTwoArg)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventThreeArg)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     ringBuffer->publishEvent(translator, std::string("Foo"), std::string("Bar"), std::string("Baz"));
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventThreeArg)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEvents)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator };
 
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEvents)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsIfBatchIsLargerThanRingBuffer)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator, eventTranslator, eventTranslator, eventTranslator };
 
@@ -231,19 +231,19 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsIfBatchIsLargerThanRingBuffer)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsWithBatchSizeOfOne)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator, eventTranslator };
 
     ringBuffer->publishEvents(translators, 0, 1);
     BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translators, 0, 1), true);
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(0, 1, boost::any(), boost::any()), *ringBuffer);
+    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(0, 1, std::any(), std::any()), *ringBuffer);
 }
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsWithinBatch)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator, eventTranslator };
 
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsWithinBatch)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArg)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, { std::string("Foo"), std::string("Foo") });
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArg)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgIfBatchIsLargerThanRingBuffer)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -276,18 +276,18 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgIfBatchIsLargerThanRingBuffer)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArgBatchSizeOfOne)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") });
     BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }), true);
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), boost::any(), boost::any()), *ringBuffer);
+    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::any(), std::any()), *ringBuffer);
 }
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArgWithinBatch)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 1, 2, { std::string("Foo"), std::string("Foo"), std::string("Foo") });
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArgWithinBatch)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArg)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") });
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArg)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsITwoArgIfBatchSizeIsBiggerThanRingBuffer)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents
@@ -324,18 +324,18 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsITwoArgIfBatchSizeIsBiggerThanRingBuf
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArgWithBatchSizeOfOne)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 0, 1, { std::string("Foo0"), std::string("Foo1") }, { std::string("Bar0"), std::string("Bar1") });
     BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo2"), std::string("Foo3") }, { std::string("Bar2"), std::string("Bar3") }), true);
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo0Bar0-0"), std::string("Foo2Bar2-1"), boost::any(), boost::any()), *ringBuffer);
+    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo0Bar0-0"), std::string("Foo2Bar2-1"), std::any(), std::any()), *ringBuffer);
 }
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArgWithinBatch)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 1, 2, { std::string("Foo0"), std::string("Foo1"), std::string("Foo2") }, { std::string("Bar0"), std::string("Bar1"), std::string("Bar2") });
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArgWithinBatch)
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArg)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") });
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArg)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgIfBatchIsLargerThanRingBuffer)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents
@@ -373,18 +373,18 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgIfBatchIsLargerThanRingBuffer
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArgBatchSizeOfOne)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") });
     BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") }), true);
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), boost::any(), boost::any()), *ringBuffer);
+    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), std::any(), std::any()), *ringBuffer);
 }
 
 BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArgWithinBatch)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 1, 2, { std::string("Foo0"), std::string("Foo1"), std::string("Foo2") },
@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArgWithinBatch)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchSizeIs0)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchSizeIs0)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator };
 
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchExtendsPastEndOfArray)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator };
 
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchExtendsPastEndOfArray)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
@@ -456,7 +456,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
@@ -467,7 +467,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
@@ -478,7 +478,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchSizeIs0)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchSizeIs0)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -499,7 +499,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -509,7 +509,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -519,7 +519,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchExtendsPastEndOfArr
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }), ArgumentException);
@@ -549,7 +549,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchSizeIs0)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -560,7 +560,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchSizeIs0)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -580,7 +580,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -590,7 +590,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -600,7 +600,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchExtendsPastEndOfArr
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -610,7 +610,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
@@ -620,7 +620,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchSizeIs0)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") },
@@ -636,7 +636,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchSizeIs0)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") },
@@ -648,7 +648,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchExtendsPastEndOfArra
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") },
@@ -660,7 +660,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") },
@@ -672,7 +672,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchStartsAtIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchExtendsPastEndOfArray)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") },
@@ -684,7 +684,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchExtendsPastEndOfA
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchSizeIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") },
@@ -696,7 +696,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchSizeIsNegative)
 
 BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchStartsAtIsNegative)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 4);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") },
@@ -708,7 +708,7 @@ BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchStartsAtIsNegativ
 
 BOOST_AUTO_TEST_CASE(ShouldAddAndRemoveSequences)
 {
-    auto ringBuffer = RingBuffer< boost::any >::createSingleProducer([] { return boost::any(); }, 16);
+    auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 16);
     auto sequenceThree = std::make_shared< Sequence >(-1);
     auto sequenceSeven = std::make_shared< Sequence >(-1);
 

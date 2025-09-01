@@ -18,13 +18,13 @@ namespace Tests
 
     std::future< std::vector< StubEvent > > RingBufferTestsFixture::getEvents(std::int64_t initial, std::int64_t toWaitFor)
     {
-        auto barrier = std::make_shared< boost::barrier >(2);
+        auto barrier = std::make_shared< std::barrier<> >(2);
         auto dependencyBarrier = m_ringBuffer->newBarrier();
 
         auto testWaiter = std::make_shared< TestWaiter >(barrier, dependencyBarrier, m_ringBuffer, initial, toWaitFor);
         auto task = std::async(std::launch::async, [=] { return testWaiter->call(); });
 
-        barrier->wait();
+        barrier->arrive_and_wait();
 
         return task;
     }
@@ -53,30 +53,30 @@ namespace Tests
         BOOST_CHECK_EQUAL(rb->hasAvailableCapacity(1), false);
     }
 
-    void RingBufferTestsFixture::assertEmptyRingBuffer(const RingBuffer< boost::any >& ringBuffer)
+    void RingBufferTestsFixture::assertEmptyRingBuffer(const RingBuffer< std::any >& ringBuffer)
     {
-        BOOST_CHECK_EQUAL(ringBuffer[0].empty(), true);
-        BOOST_CHECK_EQUAL(ringBuffer[1].empty(), true);
-        BOOST_CHECK_EQUAL(ringBuffer[2].empty(), true);
-        BOOST_CHECK_EQUAL(ringBuffer[3].empty(), true);
+        BOOST_CHECK_EQUAL(!ringBuffer[0].has_value(), true);
+        BOOST_CHECK_EQUAL(!ringBuffer[1].has_value(), true);
+        BOOST_CHECK_EQUAL(!ringBuffer[2].has_value(), true);
+        BOOST_CHECK_EQUAL(!ringBuffer[3].has_value(), true);
     }
 
-    void RingBufferTestsFixture::NoArgEventTranslator::translateTo(boost::any& eventData, std::int64_t sequence)
+    void RingBufferTestsFixture::NoArgEventTranslator::translateTo(std::any& eventData, std::int64_t sequence)
     {
         eventData = static_cast< int >(sequence);
     }
 
-    void RingBufferTestsFixture::ThreeArgEventTranslator::translateTo(boost::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1, const std::string& arg2)
+    void RingBufferTestsFixture::ThreeArgEventTranslator::translateTo(std::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1, const std::string& arg2)
     {
         eventData = arg0 + arg1 + arg2 + "-" + std::to_string(sequence);
     }
 
-    void RingBufferTestsFixture::TwoArgEventTranslator::translateTo(boost::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1)
+    void RingBufferTestsFixture::TwoArgEventTranslator::translateTo(std::any& eventData, std::int64_t sequence, const std::string& arg0, const std::string& arg1)
     {
         eventData = arg0 + arg1 + "-" + std::to_string(sequence);
     }
 
-    void RingBufferTestsFixture::OneArgEventTranslator::translateTo(boost::any& eventData, std::int64_t sequence, const std::string& arg0)
+    void RingBufferTestsFixture::OneArgEventTranslator::translateTo(std::any& eventData, std::int64_t sequence, const std::string& arg0)
     {
         eventData = arg0 + "-" + std::to_string(sequence);
     }
@@ -109,18 +109,19 @@ namespace Tests
         return m_isRunning;
     }
 
-    RingBufferTestsFixture::RingBufferEquals::RingBufferEquals(const std::initializer_list< boost::any >& values)
+    RingBufferTestsFixture::RingBufferEquals::RingBufferEquals(const std::initializer_list< std::any >& values)
         : m_values(values)
     {
     }
 
-    bool RingBufferTestsFixture::RingBufferEquals::operator==(const RingBuffer< boost::any >& ringBuffer) const
+    bool RingBufferTestsFixture::RingBufferEquals::operator==(const RingBuffer< std::any >& ringBuffer) const
     {
         auto valid = true;
         for (auto i = 0u; i < m_values.size(); ++i)
         {
             auto value = m_values[i];
-            valid &= value.empty() || anyEqual(ringBuffer[i], value);
+            //valid &= value.empty() || anyEqual(ringBuffer[i], value);
+            valid &= !value.has_value() || anyEqual(ringBuffer[i], value);
         }
         return valid;
     }
@@ -139,36 +140,36 @@ namespace Tests
         }
     }
 
-    bool RingBufferTestsFixture::RingBufferEquals::anyEqual(const boost::any& lhs, const boost::any& rhs)
+    bool RingBufferTestsFixture::RingBufferEquals::anyEqual(const std::any& lhs, const std::any& rhs)
     {
-        if (lhs.empty() && rhs.empty())
+        if (!lhs.has_value() && !rhs.has_value())
             return true;
 
-        if (lhs.empty() || rhs.empty())
+        if (!lhs.has_value() || !rhs.has_value())
             return false;
 
         if (lhs.type() != rhs.type())
             return false;
 
         if (lhs.type() == typeid(std::string))
-            return boost::any_cast< std::string >(lhs) == boost::any_cast< std::string >(rhs);
+            return std::any_cast< std::string >(lhs) == std::any_cast< std::string >(rhs);
 
         if (lhs.type() == typeid(int))
-            return boost::any_cast< int >(lhs) == boost::any_cast< int >(rhs);
+            return std::any_cast< int >(lhs) == std::any_cast< int >(rhs);
 
         throw std::runtime_error("comparison of any unimplemented for type");
     }
 
-    std::string RingBufferTestsFixture::RingBufferEquals::anyToString(const boost::any& value)
+    std::string RingBufferTestsFixture::RingBufferEquals::anyToString(const std::any& value)
     {
-        if (value.empty())
+        if (!value.has_value())
             return "";
 
         if (value.type() == typeid(std::string))
-            return boost::any_cast< std::string >(value);
+            return std::any_cast< std::string >(value);
 
         if (value.type() == typeid(int))
-            return std::to_string(boost::any_cast< int >(value));
+            return std::to_string(std::any_cast< int >(value));
 
         throw std::runtime_error("cannot get string representation of unimplemented any type");
     }

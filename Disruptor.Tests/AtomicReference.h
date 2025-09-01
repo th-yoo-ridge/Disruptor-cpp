@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/optional.hpp>
+#include <optional>
 
 
 namespace Disruptor
@@ -12,23 +12,23 @@ namespace Tests
     class AtomicReference
     {
     public:
-        explicit AtomicReference(const boost::optional< T >& value = boost::none)
+        explicit AtomicReference(const std::optional< T >& value = std::nullopt)
             : m_value(value)
         {
         }
 
-        boost::optional< T > read()
+        std::optional< T > read()
         {
             return m_value;
         }
 
-        void write(const boost::optional< T >& value)
+        void write(const std::optional< T >& value)
         {
             m_value = value;
         }
 
     private:
-        boost::optional< T > m_value;
+        std::optional< T > m_value;
     };
 
 } // namespace Tests

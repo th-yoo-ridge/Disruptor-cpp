@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <boost/thread/barrier.hpp>
+#include <barrier>
 
 #include "Disruptor/ISequenceBarrier.h"
 #include "Disruptor/RingBuffer.h"
@@ -17,7 +17,7 @@ namespace Tests
     class TestWaiter
     {
     public:
-        TestWaiter(const std::shared_ptr< boost::barrier >& barrier,
+        TestWaiter(const std::shared_ptr< std::barrier<> >& barrier,
                    const std::shared_ptr< ISequenceBarrier >& sequenceBarrier,
                    const std::shared_ptr< RingBuffer< StubEvent > >& ringBuffer,
                    std::int64_t initialSequence,
@@ -26,7 +26,7 @@ namespace Tests
         std::vector< StubEvent > call() const;
 
     private:
-        std::shared_ptr< boost::barrier > m_barrier;
+        std::shared_ptr< std::barrier<> > m_barrier;
         std::shared_ptr< ISequenceBarrier > m_sequenceBarrier;
         std::shared_ptr< RingBuffer< StubEvent > > m_ringBuffer;
         std::int64_t m_initialSequence;
