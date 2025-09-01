@@ -1,7 +1,7 @@
 #pragma once
 
 #include <chrono>
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "Disruptor/ClockConfig.h"
 
@@ -32,7 +32,7 @@ namespace PerfTests
         ClockConfig::TimePoint restart();
 
     private:
-        boost::optional< bool > m_isRunning;
+        std::optional< bool > m_isRunning;
         ClockConfig::TimePoint m_begin;
         mutable ClockConfig::TimePoint m_end;
     };

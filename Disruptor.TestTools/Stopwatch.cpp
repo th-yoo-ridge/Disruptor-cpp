@@ -23,7 +23,7 @@ namespace PerfTests
 
     bool Stopwatch::isRunning() const
     {
-        return !!m_isRunning && m_isRunning.get();
+        return m_isRunning && *m_isRunning;
     }
 
     void Stopwatch::reset()

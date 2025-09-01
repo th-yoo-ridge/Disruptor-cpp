@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "LatencyTestSession.h"
 
+#include <cmath>
+
 #include "Disruptor.TestTools/LatencyRecorder.h"
 #include "Disruptor.TestTools/Stopwatch.h"
 

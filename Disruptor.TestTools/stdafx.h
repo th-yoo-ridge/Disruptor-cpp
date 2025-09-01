@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <boost/config.hpp>
-
 #if _MSC_VER // only on Windows
 
 # ifndef WIN32_LEAN_AND_MEAN
