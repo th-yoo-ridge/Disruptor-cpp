@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(Disruptor CXX)
 
-# Find Boost, required components
-find_package(Boost REQUIRED COMPONENTS system thread chrono)
-
 # Source files
 set(Disruptor_sources
     BasicExecutor.cpp
@@ -114,13 +111,6 @@ add_library(DisruptorShared SHARED ${Disruptor_sources})
 # Use modern target property commands
 target_include_directories(DisruptorShared PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-# ???
-target_include_directories(DisruptorShared PRIVATE ${Boost_INCLUDE_DIRS})
-message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
-
-# Link Boost components using imported targets
-target_link_libraries(DisruptorShared PRIVATE Boost::system Boost::thread Boost::chrono)
-
 set_target_properties(DisruptorShared PROPERTIES
     OUTPUT_NAME Disruptor
     VERSION ${DISRUPTOR_VERSION}
@@ -129,8 +119,6 @@ set_target_properties(DisruptorShared PROPERTIES
 
 add_library(DisruptorStatic STATIC ${Disruptor_sources})
 target_include_directories(DisruptorStatic PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
-##
-target_include_directories(DisruptorStatic PRIVATE ${Boost_INCLUDE_DIRS})
 
 set_target_properties(DisruptorStatic PROPERTIES OUTPUT_NAME Disruptor)
 
