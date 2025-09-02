@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <boost/config.hpp>
 
 // STL
 #include <algorithm>
@@ -21,18 +20,7 @@
 #include <unordered_map>
 #include <vector>
 
-// Boost.Test
 
-#include "Disruptor/Pragmas.h"
-
-DISRUPTOR_PRAGMA_PUSH
-DISRUPTOR_PRAGMA_IGNORE_ALL
-DISRUPTOR_PRAGMA_IGNORE_UNUSED_VARIABLES
-
-#include <boost/test/results_reporter.hpp>
-#include <boost/test/unit_test.hpp>
-
-DISRUPTOR_PRAGMA_POP
-
-// Google Mock
+// Google Test & Mock
+#include <gtest/gtest.h>
 #include <gmock/gmock.h>

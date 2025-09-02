@@ -10,9 +10,10 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct RingBufferWithMocksFixture
+    class RingBufferWithMocksTest : public ::testing::Test
     {
-        RingBufferWithMocksFixture()
+    protected:
+        void SetUp() override
         {
             m_sequencerMock = std::make_shared< testing::NiceMock< SequencerMock< StubEvent > > >();
             m_sequencer = m_sequencerMock;
@@ -34,9 +35,8 @@ using namespace Disruptor;
 using namespace Disruptor::Tests;
 
 
-BOOST_FIXTURE_TEST_SUITE(RingBufferWithMocksTest, RingBufferWithMocksFixture)
 
-BOOST_AUTO_TEST_CASE(ShouldDelgateNextAndPublish)
+TEST_F(RingBufferWithMocksTest, ShouldDelgateNextAndPublish)
 {
     EXPECT_CALL(*m_sequencerMock, next()).WillOnce(testing::Return(34L));
     EXPECT_CALL(*m_sequencerMock, publish(34L)).Times(1);
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(ShouldDelgateNextAndPublish)
     m_ringBuffer->publish(m_ringBuffer->next());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldDelgateTryNextAndPublish)
+TEST_F(RingBufferWithMocksTest, ShouldDelgateTryNextAndPublish)
 {
     EXPECT_CALL(*m_sequencerMock, tryNext()).WillOnce(testing::Return(34L));
     EXPECT_CALL(*m_sequencerMock, publish(34L)).Times(1);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(ShouldDelgateTryNextAndPublish)
     m_ringBuffer->publish(m_ringBuffer->tryNext());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldDelgateNextNAndPublish)
+TEST_F(RingBufferWithMocksTest, ShouldDelgateNextNAndPublish)
 {
     EXPECT_CALL(*m_sequencerMock, next(10)).WillOnce(testing::Return(34L));
     EXPECT_CALL(*m_sequencerMock, publish(25L, 34L)).Times(1);
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(ShouldDelgateNextNAndPublish)
     m_ringBuffer->publish(hi - 9, hi);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldDelgateTryNextNAndPublish)
+TEST_F(RingBufferWithMocksTest, ShouldDelgateTryNextNAndPublish)
 {
     EXPECT_CALL(*m_sequencerMock, tryNext(10)).WillOnce(testing::Return(34L));
     EXPECT_CALL(*m_sequencerMock, publish(25L, 34L)).Times(1);
@@ -70,4 +70,3 @@ BOOST_AUTO_TEST_CASE(ShouldDelgateTryNextNAndPublish)
     m_ringBuffer->publish(hi - 9, hi);
 }
 
-BOOST_AUTO_TEST_SUITE_END()

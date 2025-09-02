@@ -7,7 +7,7 @@ namespace Disruptor
 namespace Tests
 {
 
-    RingBufferTestsFixture::RingBufferTestsFixture()
+    void RingBufferTestsFixture::SetUp()
     {
         m_ringBuffer = RingBuffer< StubEvent >::createMultiProducer([] { return StubEvent(-1); }, 32);
         m_sequenceBarrier = m_ringBuffer->newBarrier();
@@ -40,7 +40,7 @@ namespace Tests
             sequence->incrementAndGet();
         }
 
-        BOOST_CHECK_EQUAL(rb->cursor(), 127L);
+        EXPECT_EQ(rb->cursor(), 127L);
 
         rb->resetTo(31);
         sequence->setValue(31);
@@ -50,15 +50,15 @@ namespace Tests
             rb->publish(rb->next());
         }
 
-        BOOST_CHECK_EQUAL(rb->hasAvailableCapacity(1), false);
+        EXPECT_FALSE(rb->hasAvailableCapacity(1));
     }
 
     void RingBufferTestsFixture::assertEmptyRingBuffer(const RingBuffer< std::any >& ringBuffer)
     {
-        BOOST_CHECK_EQUAL(!ringBuffer[0].has_value(), true);
-        BOOST_CHECK_EQUAL(!ringBuffer[1].has_value(), true);
-        BOOST_CHECK_EQUAL(!ringBuffer[2].has_value(), true);
-        BOOST_CHECK_EQUAL(!ringBuffer[3].has_value(), true);
+        EXPECT_FALSE(ringBuffer[0].has_value());
+        EXPECT_FALSE(ringBuffer[1].has_value());
+        EXPECT_FALSE(ringBuffer[2].has_value());
+        EXPECT_FALSE(ringBuffer[3].has_value());
     }
 
     void RingBufferTestsFixture::NoArgEventTranslator::translateTo(std::any& eventData, std::int64_t sequence)

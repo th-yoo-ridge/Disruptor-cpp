@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <gtest/gtest.h>
 
 #include "Disruptor/AlertException.h"
 #include "Disruptor/IgnoreExceptionHandler.h"
@@ -10,10 +11,7 @@
 using namespace Disruptor;
 using namespace Disruptor::Tests;
 
-
-BOOST_FIXTURE_TEST_SUITE(SequenceBarrierTests, SequenceBarrierTestsFixture)
-
-BOOST_AUTO_TEST_CASE(ShouldWaitForWorkCompleteWhereCompleteWorkThresholdIsAhead)
+TEST_F(SequenceBarrierTestsFixture, ShouldWaitForWorkCompleteWhereCompleteWorkThresholdIsAhead)
 {
     const std::int32_t expectedNumberMessages = 10;
     const std::int32_t expectedWorkSequence = 9;
@@ -32,10 +30,10 @@ BOOST_AUTO_TEST_CASE(ShouldWaitForWorkCompleteWhereCompleteWorkThresholdIsAhead)
                                                         m_eventProcessorMock3->sequence() });
 
     auto completedWorkSequence = dependencyBarrier->waitFor(expectedWorkSequence);
-    BOOST_CHECK_GE(completedWorkSequence, expectedWorkSequence);
+    EXPECT_GE(completedWorkSequence, expectedWorkSequence);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldWaitForWorkCompleteWhereAllWorkersAreBlockedOnRingBuffer)
+TEST_F(SequenceBarrierTestsFixture, ShouldWaitForWorkCompleteWhereAllWorkersAreBlockedOnRingBuffer)
 {
     const std::int32_t expectedNumberMessages = 10;
     fillRingBuffer(expectedNumberMessages);
@@ -61,10 +59,10 @@ BOOST_AUTO_TEST_CASE(ShouldWaitForWorkCompleteWhereAllWorkersAreBlockedOnRingBuf
 
     std::int64_t expectedWorkSequence = expectedNumberMessages;
     auto completedWorkSequence = dependencyBarrier->waitFor(expectedWorkSequence);
-    BOOST_CHECK_GE(completedWorkSequence, expectedWorkSequence);
+    EXPECT_GE(completedWorkSequence, expectedWorkSequence);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldInterruptDuringBusySpin)
+TEST_F(SequenceBarrierTestsFixture, ShouldInterruptDuringBusySpin)
 {
     const std::int32_t expectedNumberMessages = 10;
     fillRingBuffer(expectedNumberMessages);
@@ -99,10 +97,10 @@ BOOST_AUTO_TEST_CASE(ShouldInterruptDuringBusySpin)
     sequenceBarrier->alert();
     future.wait();
 
-    BOOST_CHECK_MESSAGE(alerted == true, "Thread was not interrupted");
+    EXPECT_TRUE(alerted) << "Thread was not interrupted";
 }
 
-BOOST_AUTO_TEST_CASE(ShouldWaitForWorkCompleteWhereCompleteWorkThresholdIsBehind)
+TEST_F(SequenceBarrierTestsFixture, ShouldWaitForWorkCompleteWhereCompleteWorkThresholdIsBehind)
 {
     const std::int32_t expectedNumberMessages = 10;
     fillRingBuffer(expectedNumberMessages);
@@ -125,19 +123,18 @@ BOOST_AUTO_TEST_CASE(ShouldWaitForWorkCompleteWhereCompleteWorkThresholdIsBehind
 
     std::int64_t expectedWorkSequence = expectedNumberMessages - 1;
     auto completedWorkSequence = eventProcessorBarrier->waitFor(expectedWorkSequence);
-    BOOST_CHECK_GE(completedWorkSequence, expectedWorkSequence);
+    EXPECT_GE(completedWorkSequence, expectedWorkSequence);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSetAndClearAlertStatus)
+TEST_F(SequenceBarrierTestsFixture, ShouldSetAndClearAlertStatus)
 {
     auto sequenceBarrier = m_ringBuffer->newBarrier();
-    BOOST_CHECK_EQUAL(sequenceBarrier->isAlerted(), false);
+    EXPECT_FALSE(sequenceBarrier->isAlerted());
 
     sequenceBarrier->alert();
-    BOOST_CHECK_EQUAL(sequenceBarrier->isAlerted(), true);
+    EXPECT_TRUE(sequenceBarrier->isAlerted());
 
     sequenceBarrier->clearAlert();
-    BOOST_CHECK_EQUAL(sequenceBarrier->isAlerted(), false);
+    EXPECT_FALSE(sequenceBarrier->isAlerted());
 }
 
-BOOST_AUTO_TEST_SUITE_END()

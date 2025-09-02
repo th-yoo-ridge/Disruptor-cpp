@@ -15,9 +15,10 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct ConsumerRepositoryTestsFixture
+    class ConsumerRepositoryTestsFixture : public ::testing::Test
     {
-        ConsumerRepositoryTestsFixture();
+    protected:
+        void SetUp() override;
 
         std::shared_ptr< EventProcessorMock > m_eventProcessor1;
         std::shared_ptr< EventProcessorMock > m_eventProcessor2;

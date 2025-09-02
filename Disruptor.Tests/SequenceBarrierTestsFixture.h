@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <gtest/gtest.h>
 
 #include "Disruptor/NoOpEventProcessor.h"
 #include "Disruptor/RingBuffer.h"
@@ -16,15 +17,16 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct SequenceBarrierTestsFixture
+    class SequenceBarrierTestsFixture : public ::testing::Test
     {
+    public:
         class CountDownEventSequence;
         class StubEventProcessor;
 
-        SequenceBarrierTestsFixture();
+        void SetUp() override;
 
+    protected:
         void fillRingBuffer(std::int64_t expectedNumberEvents);
-
 
         std::shared_ptr< RingBuffer< StubEvent > > m_ringBuffer;
         std::shared_ptr< EventProcessorMock > m_eventProcessorMock1;

@@ -14,9 +14,11 @@
 using namespace Disruptor;
 using namespace Disruptor::Tests;
 
-BOOST_AUTO_TEST_SUITE(EventPollerTests)
+class EventPollerTests : public ::testing::Test
+{
+};
 
-BOOST_AUTO_TEST_CASE(ShouldPollForEvents)
+TEST_F(EventPollerTests, ShouldPollForEvents)
 {
     typedef std::int32_t TestDataType;
 
@@ -61,22 +63,22 @@ BOOST_AUTO_TEST_CASE(ShouldPollForEvents)
 
     // Initial State - nothing published.
     states = PollState::Idle;
-    BOOST_CHECK_EQUAL(poller->poll(handler), PollState::Idle);
+    EXPECT_EQ(poller->poll(handler), PollState::Idle);
 
     // Publish Event.
     states = PollState::Gating;
     bufferSequence->incrementAndGet();
-    BOOST_CHECK_EQUAL(poller->poll(handler), PollState::Gating);
+    EXPECT_EQ(poller->poll(handler), PollState::Gating);
 
     states = PollState::Processing;
     gatingSequence->incrementAndGet();
-    BOOST_CHECK_EQUAL(poller->poll(handler), PollState::Processing);
+    EXPECT_EQ(poller->poll(handler), PollState::Processing);
 
-    BOOST_CHECK_EQUAL(handled, true);
+    EXPECT_TRUE(handled);
 }
 
 
-BOOST_AUTO_TEST_CASE(ShouldSuccessfullyPollWhenBufferIsFull)
+TEST_F(EventPollerTests, ShouldSuccessfullyPollWhenBufferIsFull)
 {
     typedef std::int32_t DataType;
 
@@ -106,7 +108,6 @@ BOOST_AUTO_TEST_CASE(ShouldSuccessfullyPollWhenBufferIsFull)
     // think of another thread
     poller->poll(handler);
 
-    BOOST_CHECK_EQUAL(handled, 4);
+    EXPECT_EQ(handled, 4);
 }
 
-BOOST_AUTO_TEST_SUITE_END()

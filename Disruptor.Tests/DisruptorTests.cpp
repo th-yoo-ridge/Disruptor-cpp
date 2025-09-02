@@ -19,9 +19,8 @@ using namespace Disruptor;
 using namespace ::Disruptor::Tests;
 
 
-BOOST_FIXTURE_TEST_SUITE(DisruptorTests, DisruptorFixture)
 
-BOOST_AUTO_TEST_CASE(ShouldCreateEventProcessorGroupForFirstEventProcessors)
+TEST_F(DisruptorFixture, ShouldCreateEventProcessorGroupForFirstEventProcessors)
 {
     m_executor->ignoreExecutions();
     auto eventHandler1 = std::make_shared< SleepingEventHandler >();
@@ -30,11 +29,11 @@ BOOST_AUTO_TEST_CASE(ShouldCreateEventProcessorGroupForFirstEventProcessors)
     auto eventHandlerGroup = m_disruptor->handleEventsWith({ eventHandler1, eventHandler2 });
     m_disruptor->start();
 
-    BOOST_CHECK(eventHandlerGroup != nullptr);
-    BOOST_CHECK_EQUAL(m_executor->getExecutionCount(), 2);
+    EXPECT_TRUE(eventHandlerGroup != nullptr);
+    EXPECT_EQ(m_executor->getExecutionCount(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldMakeEntriesAvailableToFirstHandlersImmediately)
+TEST_F(DisruptorFixture, ShouldMakeEntriesAvailableToFirstHandlersImmediately)
 {
     auto countDownLatch = std::make_shared< CountdownEvent >(2);
     auto eventHandler = std::make_shared< EventHandlerStub< TestEvent > >(countDownLatch);
@@ -44,7 +43,7 @@ BOOST_AUTO_TEST_CASE(ShouldMakeEntriesAvailableToFirstHandlersImmediately)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldWaitUntilAllFirstEventProcessorsProcessEventBeforeMakingItAvailableToDependentEventProcessors)
+TEST_F(DisruptorFixture, ShouldWaitUntilAllFirstEventProcessorsProcessEventBeforeMakingItAvailableToDependentEventProcessors)
 {
     auto eventHandler1 = createDelayedEventHandler();
 
@@ -56,7 +55,7 @@ BOOST_AUTO_TEST_CASE(ShouldWaitUntilAllFirstEventProcessorsProcessEventBeforeMak
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { eventHandler1 });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldAllowSpecifyingSpecificEventProcessorsToWaitFor)
+TEST_F(DisruptorFixture, ShouldAllowSpecifyingSpecificEventProcessorsToWaitFor)
 {
     auto handler1 = createDelayedEventHandler();
     auto handler2 = createDelayedEventHandler();
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_CASE(ShouldAllowSpecifyingSpecificEventProcessorsToWaitFor)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { handler1, handler2 });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldWaitOnAllProducersJoinedByAnd)
+TEST_F(DisruptorFixture, ShouldWaitOnAllProducersJoinedByAnd)
 {
     auto handler1 = createDelayedEventHandler();
     auto handler2 = createDelayedEventHandler();
@@ -85,12 +84,12 @@ BOOST_AUTO_TEST_CASE(ShouldWaitOnAllProducersJoinedByAnd)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { handler1, handler2 });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldThrowExceptionIfHandlerIsNotAlreadyConsuming)
+TEST_F(DisruptorFixture, ShouldThrowExceptionIfHandlerIsNotAlreadyConsuming)
 {
-    BOOST_CHECK_THROW(m_disruptor->after(createDelayedEventHandler())->handleEventsWith(createDelayedEventHandler()), ArgumentException);
+    EXPECT_THROW(m_disruptor->after(createDelayedEventHandler())->handleEventsWith(createDelayedEventHandler()), ArgumentException);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportSpecifyingAExceptionHandlerForEventProcessors)
+TEST_F(DisruptorFixture, ShouldSupportSpecifyingAExceptionHandlerForEventProcessors)
 {
     auto eventHandled = std::make_shared< AtomicReference< std::exception > >();
     auto exceptionHandler = std::make_shared< StubExceptionHandler< TestEvent > >(eventHandled);
@@ -103,10 +102,10 @@ BOOST_AUTO_TEST_CASE(ShouldSupportSpecifyingAExceptionHandlerForEventProcessors)
     publishEvent();
 
     auto actualException = waitFor(eventHandled);
-    BOOST_CHECK(testException.what() == actualException.what());
+    EXPECT_TRUE(testException.what() == actualException.what());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldOnlyApplyExceptionsHandlersSpecifiedViaHandleExceptionsWithOnNewEventProcessors)
+TEST_F(DisruptorFixture, ShouldOnlyApplyExceptionsHandlersSpecifiedViaHandleExceptionsWithOnNewEventProcessors)
 {
     auto eventHandled = std::make_shared< AtomicReference< std::exception > >();
     auto exceptionHandler = std::make_shared< StubExceptionHandler< TestEvent > >(eventHandled);
@@ -120,10 +119,10 @@ BOOST_AUTO_TEST_CASE(ShouldOnlyApplyExceptionsHandlersSpecifiedViaHandleExceptio
     publishEvent();
 
     auto actualException = waitFor(eventHandled);
-    BOOST_CHECK(testException.what() == actualException.what());
+    EXPECT_TRUE(testException.what() == actualException.what());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportSpecifyingADefaultExceptionHandlerForEventProcessors)
+TEST_F(DisruptorFixture, ShouldSupportSpecifyingADefaultExceptionHandlerForEventProcessors)
 {
     auto eventHandled = std::make_shared< AtomicReference< std::exception > >();
     auto exceptionHandler = std::make_shared< StubExceptionHandler< TestEvent > >(eventHandled);
@@ -136,10 +135,10 @@ BOOST_AUTO_TEST_CASE(ShouldSupportSpecifyingADefaultExceptionHandlerForEventProc
     publishEvent();
 
     auto actualException = waitFor(eventHandled);
-    BOOST_CHECK(testException.what() == actualException.what());
+    EXPECT_TRUE(testException.what() == actualException.what());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldApplyDefaultExceptionHandlerToExistingEventProcessors)
+TEST_F(DisruptorFixture, ShouldApplyDefaultExceptionHandlerToExistingEventProcessors)
 {
     auto eventHandled = std::make_shared< AtomicReference< std::exception > >();
     auto exceptionHandler = std::make_shared< StubExceptionHandler< TestEvent > >(eventHandled);
@@ -152,10 +151,10 @@ BOOST_AUTO_TEST_CASE(ShouldApplyDefaultExceptionHandlerToExistingEventProcessors
     publishEvent();
 
     auto actualException = waitFor(eventHandled);
-    BOOST_CHECK(testException.what() == actualException.what());
+    EXPECT_TRUE(testException.what() == actualException.what());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldBlockProducerUntilAllEventProcessorsHaveAdvanced)
+TEST_F(DisruptorFixture, ShouldBlockProducerUntilAllEventProcessorsHaveAdvanced)
 {
     auto delayedEventHandler = createDelayedEventHandler();
     m_disruptor->handleEventsWith(delayedEventHandler);
@@ -185,7 +184,7 @@ BOOST_AUTO_TEST_CASE(ShouldBlockProducerUntilAllEventProcessorsHaveAdvanced)
     stubPublisher->halt();
 }
 
-BOOST_AUTO_TEST_CASE(ShouldBeAbleToOverrideTheExceptionHandlerForAEventProcessor)
+TEST_F(DisruptorFixture, ShouldBeAbleToOverrideTheExceptionHandlerForAEventProcessor)
 {
     auto testException = std::exception();
     auto eventHandler = std::make_shared< ExceptionThrowingEventHandler >(testException);
@@ -201,23 +200,23 @@ BOOST_AUTO_TEST_CASE(ShouldBeAbleToOverrideTheExceptionHandlerForAEventProcessor
     waitFor(reference);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldThrowExceptionWhenAddingEventProcessorsAfterTheProducerBarrierHasBeenCreated)
+TEST_F(DisruptorFixture, ShouldThrowExceptionWhenAddingEventProcessorsAfterTheProducerBarrierHasBeenCreated)
 {
     m_executor->ignoreExecutions();
     m_disruptor->handleEventsWith(std::make_shared< SleepingEventHandler >());
     m_disruptor->start();
-    BOOST_CHECK_THROW(m_disruptor->handleEventsWith(std::make_shared< SleepingEventHandler >()), InvalidOperationException);
+    EXPECT_THROW(m_disruptor->handleEventsWith(std::make_shared< SleepingEventHandler >()), InvalidOperationException);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldThrowExceptionIfStartIsCalledTwice)
+TEST_F(DisruptorFixture, ShouldThrowExceptionIfStartIsCalledTwice)
 {
     m_executor->ignoreExecutions();
     m_disruptor->handleEventsWith(std::make_shared< SleepingEventHandler >());
     m_disruptor->start();
-    BOOST_CHECK_THROW(m_disruptor->start(), InvalidOperationException);
+    EXPECT_THROW(m_disruptor->start(), InvalidOperationException);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportCustomProcessorsAsDependencies)
+TEST_F(DisruptorFixture, ShouldSupportCustomProcessorsAsDependencies)
 {
     auto&& ringBuffer = m_disruptor->ringBuffer();
 
@@ -232,7 +231,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportCustomProcessorsAsDependencies)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { delayedEventHandler });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportHandlersAsDependenciesToCustomProcessors)
+TEST_F(DisruptorFixture, ShouldSupportHandlersAsDependenciesToCustomProcessors)
 {
     auto delayedEventHandler = createDelayedEventHandler();
     m_disruptor->handleEventsWith(delayedEventHandler);
@@ -248,7 +247,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportHandlersAsDependenciesToCustomProcessors)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { delayedEventHandler });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportCustomProcessorsAndHandlersAsDependencies)
+TEST_F(DisruptorFixture, ShouldSupportCustomProcessorsAndHandlersAsDependencies)
 {
     auto delayedEventHandler1 = createDelayedEventHandler();
     auto delayedEventHandler2 = createDelayedEventHandler();
@@ -266,7 +265,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportCustomProcessorsAndHandlersAsDependencies)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { delayedEventHandler1, delayedEventHandler2 });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldProvideEventsToWorkHandlers)
+TEST_F(DisruptorFixture, ShouldProvideEventsToWorkHandlers)
 {
     auto workHandler1 = createTestWorkHandler();
     auto workHandler2 = createTestWorkHandler();
@@ -279,7 +278,7 @@ BOOST_AUTO_TEST_CASE(ShouldProvideEventsToWorkHandlers)
     workHandler2->processEvent();
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolAsDependency)
+TEST_F(DisruptorFixture, ShouldSupportUsingWorkerPoolAsDependency)
 {
     auto workHandler1 = createTestWorkHandler();
     auto workHandler2 = createTestWorkHandler();
@@ -289,7 +288,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolAsDependency)
     publishEvent();
     publishEvent();
 
-    BOOST_CHECK_EQUAL(m_disruptor->getBarrierFor(delayedEventHandler)->cursor(), -1L);
+    EXPECT_EQ(m_disruptor->getBarrierFor(delayedEventHandler)->cursor(), -1L);
 
     workHandler2->processEvent();
     workHandler1->processEvent();
@@ -297,7 +296,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolAsDependency)
     delayedEventHandler->processEvent();
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolAsDependencyAndProcessFirstEventAsSoonAsItIsAvailable)
+TEST_F(DisruptorFixture, ShouldSupportUsingWorkerPoolAsDependencyAndProcessFirstEventAsSoonAsItIsAvailable)
 {
     auto workHandler1 = createTestWorkHandler();
     auto workHandler2 = createTestWorkHandler();
@@ -314,7 +313,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolAsDependencyAndProcessFirstEven
     delayedEventHandler->processEvent();
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolWithADependency)
+TEST_F(DisruptorFixture, ShouldSupportUsingWorkerPoolWithADependency)
 {
     auto workHandler1 = createTestWorkHandler();
     auto workHandler2 = createTestWorkHandler();
@@ -331,7 +330,7 @@ BOOST_AUTO_TEST_CASE(ShouldSupportUsingWorkerPoolWithADependency)
     workHandler2->processEvent();
 }
 
-BOOST_AUTO_TEST_CASE(ShouldSupportCombiningWorkerPoolWithEventHandlerAsDependencyWhenNotPreviouslyRegistered)
+TEST_F(DisruptorFixture, ShouldSupportCombiningWorkerPoolWithEventHandlerAsDependencyWhenNotPreviouslyRegistered)
 {
     auto workHandler1 = createTestWorkHandler();
     auto delayedEventHandler1 = createDelayedEventHandler();
@@ -351,16 +350,16 @@ BOOST_AUTO_TEST_CASE(ShouldSupportCombiningWorkerPoolWithEventHandlerAsDependenc
     delayedEventHandler2->processEvent();
 }
 
-BOOST_AUTO_TEST_CASE(ShouldThrowTimeoutExceptionIfShutdownDoesNotCompleteNormally)
+TEST_F(DisruptorFixture, ShouldThrowTimeoutExceptionIfShutdownDoesNotCompleteNormally)
 {
     auto delayedEventHandler = createDelayedEventHandler();
     m_disruptor->handleEventsWith(delayedEventHandler);
     publishEvent();
 
-    BOOST_CHECK_THROW(m_disruptor->shutdown(std::chrono::seconds(1)), TimeoutException);
+    EXPECT_THROW(m_disruptor->shutdown(std::chrono::seconds(1)), TimeoutException);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldTrackRemainingCapacity)
+TEST_F(DisruptorFixture, ShouldTrackRemainingCapacity)
 {
     std::vector< std::shared_ptr< std::int64_t > > remainingCapacity = { std::make_shared< std::int64_t >(-1) };
     auto eventHandler = std::make_shared< TempEventHandler >(m_disruptor, remainingCapacity);
@@ -374,11 +373,11 @@ BOOST_AUTO_TEST_CASE(ShouldTrackRemainingCapacity)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    BOOST_CHECK_EQUAL(*remainingCapacity[0], m_ringBuffer->bufferSize() - 1L);
-    BOOST_CHECK_EQUAL(m_disruptor->ringBuffer()->getRemainingCapacity(), m_ringBuffer->bufferSize() - 0L);
+    EXPECT_EQ(*remainingCapacity[0], m_ringBuffer->bufferSize() - 1L);
+    EXPECT_EQ(m_disruptor->ringBuffer()->getRemainingCapacity(), m_ringBuffer->bufferSize() - 0L);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldAllowEventHandlerWithSuperType)
+TEST_F(DisruptorFixture, ShouldAllowEventHandlerWithSuperType)
 {
     auto latch = std::make_shared< CountdownEvent >(2);
     auto objectHandler = std::make_shared< EventHandlerStub< TestEvent > >(latch);
@@ -388,7 +387,7 @@ BOOST_AUTO_TEST_CASE(ShouldAllowEventHandlerWithSuperType)
     ensureTwoEventsProcessedAccordingToDependencies(latch);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldAllowChainingEventHandlersWithSuperType)
+TEST_F(DisruptorFixture, ShouldAllowChainingEventHandlersWithSuperType)
 {
     auto latch = std::make_shared< CountdownEvent >(2);
     auto delayedEventHandler = createDelayedEventHandler();
@@ -399,7 +398,7 @@ BOOST_AUTO_TEST_CASE(ShouldAllowChainingEventHandlersWithSuperType)
     ensureTwoEventsProcessedAccordingToDependencies(latch, { delayedEventHandler });
 }
 
-BOOST_AUTO_TEST_CASE(ShouldMakeEntriesAvailableToFirstCustomProcessorsImmediately)
+TEST_F(DisruptorFixture, ShouldMakeEntriesAvailableToFirstCustomProcessorsImmediately)
 {
     auto countDownLatch = std::make_shared< CountdownEvent >(2);
     auto eventHandler = std::make_shared< EventHandlerStub< TestEvent > >(countDownLatch);
@@ -409,7 +408,7 @@ BOOST_AUTO_TEST_CASE(ShouldMakeEntriesAvailableToFirstCustomProcessorsImmediatel
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldHonourDependenciesForCustomProcessors)
+TEST_F(DisruptorFixture, ShouldHonourDependenciesForCustomProcessors)
 {
     auto countDownLatch = std::make_shared< CountdownEvent >(2);
     auto eventHandler = std::make_shared< EventHandlerStub< TestEvent > >(countDownLatch);
@@ -420,4 +419,3 @@ BOOST_AUTO_TEST_CASE(ShouldHonourDependenciesForCustomProcessors)
     ensureTwoEventsProcessedAccordingToDependencies(countDownLatch, { delayedEventHandler });
 }
 
-BOOST_AUTO_TEST_SUITE_END()

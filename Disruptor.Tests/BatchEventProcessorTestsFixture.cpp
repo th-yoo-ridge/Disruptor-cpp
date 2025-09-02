@@ -7,8 +7,7 @@ namespace Disruptor
 namespace Tests
 {
 
-    BatchEventProcessorTestsFixture::BatchEventProcessorTestsFixture()
-        : m_countDownEvent(1)
+    void BatchEventProcessorTestsFixture::SetUp()
     {
         auto eventFactory = []() { return StubEvent(-1); };
 

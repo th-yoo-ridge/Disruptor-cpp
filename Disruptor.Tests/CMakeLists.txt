@@ -1,13 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(Disruptor.Tests CXX)
 
-find_package(Boost COMPONENTS system chrono thread unit_test_framework)
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIRS})
-endif()
-
-#ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
+# Google Test for testing framework
+find_package(GTest REQUIRED)
 
 set(DisruptorTests_sources
 
@@ -60,8 +55,15 @@ set(DisruptorTests_sources
 include_directories("..")
 
 add_executable(Disruptor.Tests ${DisruptorTests_sources})
-#target_link_libraries(Disruptor.Tests DisruptorStatic Disruptor.TestTools ${Boost_LIBRARIES} gmock)
-target_link_libraries(Disruptor.Tests DisruptorStatic Disruptor.TestTools ${Boost_LIBRARIES} Boost::unit_test_framework gmock)
+
+target_link_libraries(Disruptor.Tests
+	DisruptorStatic
+	Disruptor.TestTools
+	GTest::gtest
+	GTest::gtest_main
+	GTest::gmock
+	GTest::gmock_main
+)
 
 add_test(cmake_Disruptor.Tests ${CMAKE_CURRENT_BINARY_DIR}/Disruptor.Tests --result_code=no --report_level=no)
 

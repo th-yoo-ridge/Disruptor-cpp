@@ -22,7 +22,7 @@ namespace Tests
         auto barrier = std::make_shared< DummySequenceBarrier >();
         auto sequence = waitStrategy->waitFor(0, *cursor, *sequencerUpdater->sequence, *barrier);
 
-        BOOST_CHECK_EQUAL(sequence, 0L);
+        EXPECT_EQ(sequence, 0L);
     }
     
 } // namespace Tests

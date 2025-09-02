@@ -26,5 +26,21 @@ namespace Tests
         std::shared_ptr< Sequence > m_gatingSequence;
     };
     
+    template<typename T>
+    class SequencerTestFixtureTyped : public ::testing::Test
+    {
+    public:
+        SequencerTestFixtureTyped()
+            : m_waitStrategy(std::make_shared< BlockingWaitStrategy >())
+            , m_sequencer(std::make_shared< T >(m_bufferSize, m_waitStrategy))
+            , m_gatingSequence(std::make_shared< Sequence >())
+        {}
+    
+        const std::int32_t m_bufferSize = 16;
+        std::shared_ptr< IWaitStrategy > m_waitStrategy;
+        std::shared_ptr< T > m_sequencer;
+        std::shared_ptr< Sequence > m_gatingSequence;
+    };
+    
 } // namespace Tests
 } // namespace Disruptor

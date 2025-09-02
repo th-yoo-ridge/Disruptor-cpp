@@ -7,7 +7,7 @@ namespace Disruptor
 namespace Tests
 {
 
-    DisruptorFixture::DisruptorFixture()
+    void DisruptorFixture::SetUp()
     {
         m_lastPublishedEvent = nullptr;
         m_ringBuffer = nullptr;
@@ -17,7 +17,7 @@ namespace Tests
         m_disruptor = std::make_shared< disruptor< TestEvent > >([] { return TestEvent(); }, 4, m_executor);
     }
 
-    DisruptorFixture::~DisruptorFixture()
+    void DisruptorFixture::TearDown()
     {
         for (auto&& delayedEventHandler : m_delayedEventHandlers)
         {
@@ -57,7 +57,7 @@ namespace Tests
     std::shared_ptr< IEventProcessor > DisruptorFixture::EventProcessorFactory::createEventProcessor(const std::shared_ptr< RingBuffer< TestEvent > >& ringBuffer,
                                                                                                      const std::vector< std::shared_ptr< ISequence > >& barrierSequences)
     {
-        BOOST_CHECK_MESSAGE((size_t)m_sequenceLength == barrierSequences.size(), "Should not have had any barrier sequences");
+        EXPECT_EQ((size_t)m_sequenceLength, barrierSequences.size()) << "Should not have had any barrier sequences";
         return std::make_shared< BatchEventProcessor< TestEvent > >(m_disruptor->ringBuffer(), ringBuffer->newBarrier(barrierSequences), m_eventHandler);
     }
 
@@ -94,13 +94,13 @@ namespace Tests
 
         if (strict)
         {
-            BOOST_CHECK_EQUAL(stubPublisher->getPublicationCount(), expectedPublicationCount);
+            EXPECT_EQ(stubPublisher->getPublicationCount(), expectedPublicationCount);
         }
         else
         {
             auto actualPublicationCount = stubPublisher->getPublicationCount();
-            BOOST_CHECK_MESSAGE(actualPublicationCount >= expectedPublicationCount,
-                "Producer reached unexpected count. Expected at least " << expectedPublicationCount << " but only reached " << actualPublicationCount);
+            EXPECT_GE(actualPublicationCount, expectedPublicationCount)
+                << "Producer reached unexpected count. Expected at least " << expectedPublicationCount << " but only reached " << actualPublicationCount;
         }
     }
 
@@ -123,6 +123,11 @@ namespace Tests
             for (auto&& eventHandler : m_delayedEventHandlers)
             {
                 eventHandler->awaitStart();
+            }
+
+            for (auto&& workHandler : m_testWorkHandlers)
+            {
+                workHandler->awaitStart();
             }
         }
 
@@ -154,13 +159,13 @@ namespace Tests
 
     void DisruptorFixture::assertThatCountDownLatchEquals(const std::shared_ptr< CountdownEvent >& countDownLatch, std::int64_t expectedCountDownValue) const
     {
-        BOOST_CHECK_EQUAL(countDownLatch->currentCount(), expectedCountDownValue);
+        EXPECT_EQ(countDownLatch->currentCount(), expectedCountDownValue);
     }
 
     void DisruptorFixture::assertThatCountDownLatchIsZero(const std::shared_ptr< CountdownEvent >& countDownLatch) const
     {
         auto released = countDownLatch->wait(std::chrono::seconds(m_timeoutInSeconds));
-        BOOST_CHECK_MESSAGE(released == true, "Batch handler did not receive entries: " << countDownLatch->currentCount());
+        EXPECT_TRUE(released) << "Batch handler did not receive entries: " << countDownLatch->currentCount();
     }
 
 } // namespace Tests

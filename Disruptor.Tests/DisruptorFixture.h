@@ -22,14 +22,15 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct DisruptorFixture
+    class DisruptorFixture : public ::testing::Test
     {
+    protected:
         class EventProcessorFactory;
         class EventTranslator;
         class TempEventHandler;
 
-        DisruptorFixture();
-        ~DisruptorFixture();
+        void SetUp() override;
+        void TearDown() override;
 
         std::shared_ptr< TestWorkHandler > createTestWorkHandler();
 

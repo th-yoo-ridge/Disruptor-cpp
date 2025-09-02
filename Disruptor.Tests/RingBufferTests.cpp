@@ -8,12 +8,9 @@
 using namespace Disruptor;
 using namespace Disruptor::Tests;
 
-
-BOOST_FIXTURE_TEST_SUITE(RingBufferTests, RingBufferTestsFixture)
-
-BOOST_AUTO_TEST_CASE(ShouldClaimAndGet)
+TEST_F(RingBufferTestsFixture, ShouldClaimAndGet)
 {
-    BOOST_CHECK_EQUAL(Sequence::InitialCursorValue, m_ringBuffer->cursor());
+    EXPECT_EQ(Sequence::InitialCursorValue, m_ringBuffer->cursor());
     
     auto expectedEvent = StubEvent(2701);
 
@@ -23,15 +20,15 @@ BOOST_AUTO_TEST_CASE(ShouldClaimAndGet)
     m_ringBuffer->publish(claimSequence);
 
     auto sequence = m_sequenceBarrier->waitFor(0);
-    BOOST_CHECK_EQUAL(0, sequence);
+    EXPECT_EQ(0, sequence);
 
     auto& evt = (*m_ringBuffer)[sequence];
-    BOOST_CHECK_EQUAL(expectedEvent, evt);
+    EXPECT_EQ(expectedEvent, evt);
     
-    BOOST_CHECK_EQUAL(0L, m_ringBuffer->cursor());
+    EXPECT_EQ(0L, m_ringBuffer->cursor());
 }
 
-BOOST_AUTO_TEST_CASE(ShouldClaimAndGetInSeparateThread)
+TEST_F(RingBufferTestsFixture, ShouldClaimAndGetInSeparateThread)
 {
     auto events = getEvents(0, 0);
 
@@ -42,10 +39,10 @@ BOOST_AUTO_TEST_CASE(ShouldClaimAndGetInSeparateThread)
     oldEvent.copy(expectedEvent);
     m_ringBuffer->publishEvent(StubEvent::translator(), expectedEvent.value(), expectedEvent.testString());
 
-    BOOST_CHECK_EQUAL(expectedEvent, events.get()[0]);
+    EXPECT_EQ(expectedEvent, events.get()[0]);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldClaimAndGetMultipleMessages)
+TEST_F(RingBufferTestsFixture, ShouldClaimAndGetMultipleMessages)
 {
     auto numEvents = m_ringBuffer->bufferSize();
     for (auto i = 0; i < numEvents; ++i)
@@ -55,15 +52,15 @@ BOOST_AUTO_TEST_CASE(ShouldClaimAndGetMultipleMessages)
 
     auto expectedSequence = numEvents - 1;
     auto available = m_sequenceBarrier->waitFor(expectedSequence);
-    BOOST_CHECK_EQUAL(expectedSequence, available);
+    EXPECT_EQ(expectedSequence, available);
 
     for (auto i = 0; i < numEvents; ++i)
     {
-        BOOST_CHECK_EQUAL(i, (*m_ringBuffer)[i].value());
+        EXPECT_EQ(i, (*m_ringBuffer)[i].value());
     }
 }
 
-BOOST_AUTO_TEST_CASE(ShouldWrap)
+TEST_F(RingBufferTestsFixture, ShouldWrap)
 {
     auto numEvents = m_ringBuffer->bufferSize();
     auto offset = 1000;
@@ -74,15 +71,15 @@ BOOST_AUTO_TEST_CASE(ShouldWrap)
 
     auto expectedSequence = numEvents + offset - 1;
     auto available = m_sequenceBarrier->waitFor(expectedSequence);
-    BOOST_CHECK_EQUAL(expectedSequence, available);
+    EXPECT_EQ(expectedSequence, available);
 
     for (auto i = offset; i < numEvents + offset; ++i)
     {
-        BOOST_CHECK_EQUAL(i, (*m_ringBuffer)[i].value());
+        EXPECT_EQ(i, (*m_ringBuffer)[i].value());
     }
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPreventWrapping)
+TEST_F(RingBufferTestsFixture, ShouldPreventWrapping)
 {
     auto sequence = std::make_shared< Sequence >(Sequence::InitialCursorValue);
     auto ringBuffer = RingBuffer< StubEvent >::createMultiProducer([] { return StubEvent(-1); }, 4);
@@ -93,10 +90,10 @@ BOOST_AUTO_TEST_CASE(ShouldPreventWrapping)
     ringBuffer->publishEvent(StubEvent::translator(), 2, std::string("2"));
     ringBuffer->publishEvent(StubEvent::translator(), 3, std::string("3"));
 
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvent(StubEvent::translator(), 3, std::string("3")), false);
+    EXPECT_FALSE(ringBuffer->tryPublishEvent(StubEvent::translator(), 3, std::string("3")));
 }
 
-BOOST_AUTO_TEST_CASE(ShouldThrowExceptionIfBufferIsFull)
+TEST_F(RingBufferTestsFixture, ShouldThrowExceptionIfBufferIsFull)
 {
     m_ringBuffer->addGatingSequences({ std::make_shared< Sequence >(m_ringBuffer->bufferSize()) });
 
@@ -122,7 +119,7 @@ BOOST_AUTO_TEST_CASE(ShouldThrowExceptionIfBufferIsFull)
     }
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPreventProducersOvertakingEventProcessorsWrapPoint)
+TEST_F(RingBufferTestsFixture, ShouldPreventProducersOvertakingEventProcessorsWrapPoint)
 {
     auto ringBufferSize = 4;
     ManualResetEvent mre(false);
@@ -151,18 +148,18 @@ BOOST_AUTO_TEST_CASE(ShouldPreventProducersOvertakingEventProcessorsWrapPoint)
 
     mre.waitOne();
 
-    BOOST_CHECK_EQUAL(ringBuffer->cursor(), ringBufferSize - 1);
-    BOOST_CHECK_EQUAL(producerComplete, false);
+    EXPECT_EQ(ringBuffer->cursor(), ringBufferSize - 1);
+    EXPECT_FALSE(producerComplete);
 
     processor->run();
 
     if (thread.joinable())
         thread.join();
 
-    BOOST_CHECK_EQUAL(producerComplete, true);
+    EXPECT_TRUE(producerComplete);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEvent)
+TEST_F(RingBufferTestsFixture, ShouldPublishEvent)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
@@ -170,10 +167,10 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEvent)
     ringBuffer->publishEvent(translator);
     ringBuffer->tryPublishEvent(translator);
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents(0, 1), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents(0, 1), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventOneArg)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventOneArg)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
@@ -181,10 +178,10 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventOneArg)
     ringBuffer->publishEvent(translator, std::string("Foo"));
     ringBuffer->tryPublishEvent(translator, std::string("Foo"));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents(std::string("Foo-0"), std::string("Foo-1")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents(std::string("Foo-0"), std::string("Foo-1")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventTwoArg)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventTwoArg)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
@@ -192,10 +189,10 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventTwoArg)
     ringBuffer->publishEvent(translator, std::string("Foo"), std::string("Bar"));
     ringBuffer->tryPublishEvent(translator, std::string("Foo"), std::string("Bar"));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents(std::string("FooBar-0"), std::string("FooBar-1")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents(std::string("FooBar-0"), std::string("FooBar-1")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventThreeArg)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventThreeArg)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
@@ -203,116 +200,116 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventThreeArg)
     ringBuffer->publishEvent(translator, std::string("Foo"), std::string("Bar"), std::string("Baz"));
     ringBuffer->tryPublishEvent(translator, std::string("Foo"), std::string("Bar"), std::string("Baz"));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents(std::string("FooBarBaz-0"), std::string("FooBarBaz-1")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents(std::string("FooBarBaz-0"), std::string("FooBarBaz-1")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEvents)
+TEST_F(RingBufferTestsFixture, ShouldPublishEvents)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator };
 
     ringBuffer->publishEvents(translators);
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translators), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translators));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(0, 1, 2, 3), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(0, 1, 2, 3), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsIfBatchIsLargerThanRingBuffer)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsIfBatchIsLargerThanRingBuffer)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator, eventTranslator, eventTranslator, eventTranslator };
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translators), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translators), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsWithBatchSizeOfOne)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsWithBatchSizeOfOne)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator, eventTranslator };
 
     ringBuffer->publishEvents(translators, 0, 1);
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translators, 0, 1), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translators, 0, 1));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(0, 1, std::any(), std::any()), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(0, 1, std::any(), std::any()), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsWithinBatch)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsWithinBatch)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto eventTranslator = std::make_shared< NoArgEventTranslator >();
     auto translators = { eventTranslator, eventTranslator, eventTranslator };
 
     ringBuffer->publishEvents(translators, 1, 2);
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translators, 1, 2), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translators, 1, 2));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(0, 1, 2, 3), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(0, 1, 2, 3), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArg)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsOneArg)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, { std::string("Foo"), std::string("Foo") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::string("Foo-2"), std::string("Foo-3")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::string("Foo-2"), std::string("Foo-3")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgIfBatchIsLargerThanRingBuffer)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsOneArgIfBatchIsLargerThanRingBuffer)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArgBatchSizeOfOne)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsOneArgBatchSizeOfOne)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::any(), std::any()), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::any(), std::any()), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsOneArgWithinBatch)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsOneArgWithinBatch)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 1, 2, { std::string("Foo"), std::string("Foo"), std::string("Foo") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 1, 2, { std::string("Foo"), std::string("Foo"), std::string("Foo") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, 1, 2, { std::string("Foo"), std::string("Foo"), std::string("Foo") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::string("Foo-2"), std::string("Foo-3")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("Foo-0"), std::string("Foo-1"), std::string("Foo-2"), std::string("Foo-3")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArg)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsTwoArg)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("FooBar-0"), std::string("FooBar-1"), std::string("FooBar-2"), std::string("FooBar-3")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("FooBar-0"), std::string("FooBar-1"), std::string("FooBar-2"), std::string("FooBar-3")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsITwoArgIfBatchSizeIsBiggerThanRingBuffer)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsITwoArgIfBatchSizeIsBiggerThanRingBuffer)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents
+    EXPECT_THROW(ringBuffer->tryPublishEvents
     (
         translator,
         { std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo") },
@@ -322,45 +319,45 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsITwoArgIfBatchSizeIsBiggerThanRingBuf
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArgWithBatchSizeOfOne)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsTwoArgWithBatchSizeOfOne)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 0, 1, { std::string("Foo0"), std::string("Foo1") }, { std::string("Bar0"), std::string("Bar1") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo2"), std::string("Foo3") }, { std::string("Bar2"), std::string("Bar3") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo2"), std::string("Foo3") }, { std::string("Bar2"), std::string("Bar3") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo0Bar0-0"), std::string("Foo2Bar2-1"), std::any(), std::any()), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("Foo0Bar0-0"), std::string("Foo2Bar2-1"), std::any(), std::any()), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsTwoArgWithinBatch)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsTwoArgWithinBatch)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 1, 2, { std::string("Foo0"), std::string("Foo1"), std::string("Foo2") }, { std::string("Bar0"), std::string("Bar1"), std::string("Bar2") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 1, 2, { std::string("Foo3"), std::string("Foo4"), std::string("Foo5") }, { std::string("Bar3"), std::string("Bar4"), std::string("Bar5") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, 1, 2, { std::string("Foo3"), std::string("Foo4"), std::string("Foo5") }, { std::string("Bar3"), std::string("Bar4"), std::string("Bar5") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo1Bar1-0"), std::string("Foo2Bar2-1"), std::string("Foo4Bar4-2"), std::string("Foo5Bar5-3")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("Foo1Bar1-0"), std::string("Foo2Bar2-1"), std::string("Foo4Bar4-2"), std::string("Foo5Bar5-3")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArg)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsThreeArg)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), std::string("FooBarBaz-2"), std::string("FooBarBaz-3")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), std::string("FooBarBaz-2"), std::string("FooBarBaz-3")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgIfBatchIsLargerThanRingBuffer)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsThreeArgIfBatchIsLargerThanRingBuffer)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents
+    EXPECT_THROW(ringBuffer->tryPublishEvents
     (
         translator,
         { std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo"), std::string("Foo") },
@@ -371,18 +368,18 @@ BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgIfBatchIsLargerThanRingBuffer
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArgBatchSizeOfOne)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsThreeArgBatchSizeOfOne)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
     ringBuffer->publishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") });
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") }), true);
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, 0, 1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }, { std::string("Baz"), std::string("Baz") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), std::any(), std::any()), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("FooBarBaz-0"), std::string("FooBarBaz-1"), std::any(), std::any()), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArgWithinBatch)
+TEST_F(RingBufferTestsFixture, ShouldPublishEventsThreeArgWithinBatch)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
@@ -391,322 +388,322 @@ BOOST_AUTO_TEST_CASE(ShouldPublishEventsThreeArgWithinBatch)
                                                 { std::string("Bar0"), std::string("Bar1"), std::string("Bar2") },
                                                 { std::string("Baz0"), std::string("Baz1"), std::string("Baz2") });
     
-    BOOST_CHECK_EQUAL(ringBuffer->tryPublishEvents(translator, 1, 2, { std::string("Foo3"), std::string("Foo4"), std::string("Foo5") },
+    EXPECT_TRUE(ringBuffer->tryPublishEvents(translator, 1, 2, { std::string("Foo3"), std::string("Foo4"), std::string("Foo5") },
                                                                      { std::string("Bar3"), std::string("Bar4"), std::string("Bar5") },
-                                                                     { std::string("Baz3"), std::string("Baz4"), std::string("Baz5") }), true);
+                                                                     { std::string("Baz3"), std::string("Baz4"), std::string("Baz5") }));
 
-    BOOST_CHECK_EQUAL(m_ringBufferWithEvents4(std::string("Foo1Bar1Baz1-0"), std::string("Foo2Bar2Baz2-1"), std::string("Foo4Bar4Baz4-2"), std::string("Foo5Bar5Baz5-3")), *ringBuffer);
+    EXPECT_EQ(m_ringBufferWithEvents4(std::string("Foo1Bar1Baz1-0"), std::string("Foo2Bar2Baz2-1"), std::string("Foo4Bar4Baz4-2"), std::string("Foo5Bar5Baz5-3")), *ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchSizeIs0)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsWhenBatchSizeIs0)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translators, 1, 0), ArgumentException);
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translators, 1, 0), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translators, 1, 0), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translators, 1, 0), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translators, 1, 3), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translators, 1, 3), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translators, 1, 3), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translators, 1, 3), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translators, 1, -1), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translators, 1, -1), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translators, 1, -1), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translators, 1, -1), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translators, -1, 2), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translators, -1, 2), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< NoArgEventTranslator >();
     auto translators = { translator, translator, translator, translator };
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translators, -1, 2), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translators, -1, 2), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchSizeIs0)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsOneArgWhenBatchSizeIs0)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }), ArgumentException);
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsOneArgWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsOneArgWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsOneArgWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsOneArgWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsOneArgWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsOneArgWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsOneArgWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< OneArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchSizeIs0)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsTwoArgWhenBatchSizeIs0)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsTwoArgWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsTwoArgWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsTwoArgWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsTwoArgWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsTwoArgWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsTwoArgWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsTwoArgWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< TwoArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") }, { std::string("Bar"), std::string("Bar") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchSizeIs0)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsThreeArgWhenBatchSizeIs0)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") },
                                                                   { std::string("Bar"), std::string("Bar") },
                                                                   { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, 0, { std::string("Foo"), std::string("Foo") },
                                                                      { std::string("Bar"), std::string("Bar") },
                                                                      { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsThreeArgWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") },
                                                                   { std::string("Bar"), std::string("Bar") },
                                                                   { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsThreeArgWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->publishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") },
                                                                    { std::string("Bar"), std::string("Bar") },
                                                                    { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotPublishEventsThreeArgWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotPublishEventsThreeArgWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->publishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") },
                                                                    { std::string("Bar"), std::string("Bar") },
                                                                    { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchExtendsPastEndOfArray)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsThreeArgWhenBatchExtendsPastEndOfArray)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, 3, { std::string("Foo"), std::string("Foo") },
                                                                      { std::string("Bar"), std::string("Bar") },
                                                                      { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchSizeIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsThreeArgWhenBatchSizeIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, 1, -1, { std::string("Foo"), std::string("Foo") },
                                                                       { std::string("Bar"), std::string("Bar") },
                                                                       { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldNotTryPublishEventsThreeArgWhenBatchStartsAtIsNegative)
+TEST_F(RingBufferTestsFixture, ShouldNotTryPublishEventsThreeArgWhenBatchStartsAtIsNegative)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 4);
     auto translator = std::make_shared< ThreeArgEventTranslator >();
 
-    BOOST_CHECK_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") },
+    EXPECT_THROW(ringBuffer->tryPublishEvents(translator, -1, 2, { std::string("Foo"), std::string("Foo") },
                                                                       { std::string("Bar"), std::string("Bar") },
                                                                       { std::string("Baz"), std::string("Baz") }), ArgumentException);
 
     assertEmptyRingBuffer(*ringBuffer);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldAddAndRemoveSequences)
+TEST_F(RingBufferTestsFixture, ShouldAddAndRemoveSequences)
 {
     auto ringBuffer = RingBuffer< std::any >::createSingleProducer([] { return std::any(); }, 16);
     auto sequenceThree = std::make_shared< Sequence >(-1);
@@ -722,19 +719,18 @@ BOOST_AUTO_TEST_CASE(ShouldAddAndRemoveSequences)
     sequenceThree->setValue(3);
     sequenceSeven->setValue(7);
     
-    BOOST_CHECK_EQUAL(ringBuffer->getMinimumGatingSequence(), 3L);
-    BOOST_CHECK_EQUAL(ringBuffer->removeGatingSequence(sequenceThree), true);
-    BOOST_CHECK_EQUAL(ringBuffer->getMinimumGatingSequence(), 7L);
+    EXPECT_EQ(ringBuffer->getMinimumGatingSequence(), 3L);
+    EXPECT_TRUE(ringBuffer->removeGatingSequence(sequenceThree));
+    EXPECT_EQ(ringBuffer->getMinimumGatingSequence(), 7L);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldHandleResetToAndNotWrapUnecessarilySingleProducer)
+TEST_F(RingBufferTestsFixture, ShouldHandleResetToAndNotWrapUnecessarilySingleProducer)
 {
     assertHandleResetAndNotWrap(RingBuffer< StubEvent >::createSingleProducer(StubEvent::eventFactory(), 4));
 }
 
-BOOST_AUTO_TEST_CASE(ShouldHandleResetToAndNotWrapUnecessarilyMultiProducer)
+TEST_F(RingBufferTestsFixture, ShouldHandleResetToAndNotWrapUnecessarilyMultiProducer)
 {
     assertHandleResetAndNotWrap(RingBuffer< StubEvent >::createMultiProducer(StubEvent::eventFactory(), 4));
 }
 
-BOOST_AUTO_TEST_SUITE_END()

@@ -8,9 +8,11 @@
 using namespace Disruptor;
 
 
-BOOST_AUTO_TEST_SUITE(FatalExceptionHandlerTests)
+class FatalExceptionHandlerTests : public ::testing::Test
+{
+};
 
-BOOST_AUTO_TEST_CASE(ShouldHandleFatalException)
+TEST_F(FatalExceptionHandlerTests, ShouldHandleFatalException)
 {
     auto causeException = ArgumentException("FatalExceptionHandlerTests.ShouldHandleFatalException");
     auto evt = Tests::StubEvent(0);
@@ -23,8 +25,6 @@ BOOST_AUTO_TEST_CASE(ShouldHandleFatalException)
     }
     catch (FatalException& ex)
     {
-        BOOST_CHECK_EQUAL(causeException.what(), ex.innerException().what());
+        EXPECT_EQ(causeException.what(), ex.innerException().what());
     }
 }
-
-BOOST_AUTO_TEST_SUITE_END()

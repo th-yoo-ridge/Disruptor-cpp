@@ -68,7 +68,7 @@ namespace Tests
     //             }
     //         }
 
-    //         BOOST_CHECK_MESSAGE(thread.joinable() == false, "Failed to stop thread: " << thread.get_id());
+    //         EXPECT_FALSE(thread.joinable()) << "Failed to stop thread: " << thread.get_id();
     //     }
     // }
     void StubExecutor::joinAllThreads()
@@ -93,7 +93,7 @@ namespace Tests
                 }
             }
 
-            // If you're using Boost's BOOST_CHECK_MESSAGE, replace it with a C++ assert or logging
+            // If you're using Google Test's EXPECT_* macros, they provide better error reporting
             assert(!thread.joinable() && "Failed to stop thread");
         }
     }

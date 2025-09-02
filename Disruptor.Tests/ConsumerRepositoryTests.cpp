@@ -7,21 +7,19 @@ using namespace Disruptor;
 using namespace Disruptor::Tests;
 
 
-BOOST_AUTO_TEST_SUITE(ConsumerRepositoryTests)
-
-BOOST_FIXTURE_TEST_CASE(ShouldGetBarrierByHandler, ConsumerRepositoryTestsFixture)
+TEST_F(ConsumerRepositoryTestsFixture, ShouldGetBarrierByHandler)
 {
     m_consumerRepository.add(m_eventProcessor1, m_handler1, m_barrier1);
 
-    BOOST_CHECK_EQUAL(m_consumerRepository.getBarrierFor(m_handler1), m_barrier1);
+    EXPECT_EQ(m_consumerRepository.getBarrierFor(m_handler1), m_barrier1);
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldReturnNullForBarrierWhenHandlerIsNotRegistered, ConsumerRepositoryTestsFixture)
+TEST_F(ConsumerRepositoryTestsFixture, ShouldReturnNullForBarrierWhenHandlerIsNotRegistered)
 {
-    BOOST_CHECK(m_consumerRepository.getBarrierFor(m_handler1) == nullptr);
+    EXPECT_EQ(m_consumerRepository.getBarrierFor(m_handler1), nullptr);
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldGetLastEventProcessorsInChain, ConsumerRepositoryTestsFixture)
+TEST_F(ConsumerRepositoryTestsFixture, ShouldGetLastEventProcessorsInChain)
 {
     m_consumerRepository.add(m_eventProcessor1, m_handler1, m_barrier1);
     m_consumerRepository.add(m_eventProcessor2, m_handler2, m_barrier2);
@@ -30,23 +28,23 @@ BOOST_FIXTURE_TEST_CASE(ShouldGetLastEventProcessorsInChain, ConsumerRepositoryT
 
     auto lastEventProcessorsInChain = m_consumerRepository.getLastSequenceInChain(true);
 
-    BOOST_CHECK_EQUAL(lastEventProcessorsInChain.size(), 1u);
-    BOOST_CHECK_EQUAL(lastEventProcessorsInChain[0], m_eventProcessor1->sequence());
+    EXPECT_EQ(lastEventProcessorsInChain.size(), 1u);
+    EXPECT_EQ(lastEventProcessorsInChain[0], m_eventProcessor1->sequence());
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldRetrieveEventProcessorForHandler, ConsumerRepositoryTestsFixture)
+TEST_F(ConsumerRepositoryTestsFixture, ShouldRetrieveEventProcessorForHandler)
 {
     m_consumerRepository.add(m_eventProcessor1, m_handler1, m_barrier1);
 
-    BOOST_CHECK(m_consumerRepository.getEventProcessorFor(m_handler1) == m_eventProcessor1);
+    EXPECT_EQ(m_consumerRepository.getEventProcessorFor(m_handler1), m_eventProcessor1);
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldThrowExceptionWhenHandlerIsNotRegistered, ConsumerRepositoryTestsFixture)
+TEST_F(ConsumerRepositoryTestsFixture, ShouldThrowExceptionWhenHandlerIsNotRegistered)
 {
-    BOOST_CHECK_THROW(m_consumerRepository.getEventProcessorFor(std::shared_ptr< SleepingEventHandler >()), Disruptor::ArgumentException);
+    EXPECT_THROW(m_consumerRepository.getEventProcessorFor(std::shared_ptr< SleepingEventHandler >()), Disruptor::ArgumentException);
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldIterateAllEventProcessors, ConsumerRepositoryTestsFixture)
+TEST_F(ConsumerRepositoryTestsFixture, ShouldIterateAllEventProcessors)
 {
     m_consumerRepository.add(m_eventProcessor1, m_handler1, m_barrier1);
     m_consumerRepository.add(m_eventProcessor2, m_handler2, m_barrier2);
@@ -67,12 +65,10 @@ BOOST_FIXTURE_TEST_CASE(ShouldIterateAllEventProcessors, ConsumerRepositoryTests
         }
         else
         {
-            BOOST_FAIL("Unexpected eventProcessor info");
+            FAIL() << "Unexpected eventProcessor info";
         }
     }
 
-    BOOST_CHECK_EQUAL(seen1, true);
-    BOOST_CHECK_EQUAL(seen2, true);
+    EXPECT_TRUE(seen1);
+    EXPECT_TRUE(seen2);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

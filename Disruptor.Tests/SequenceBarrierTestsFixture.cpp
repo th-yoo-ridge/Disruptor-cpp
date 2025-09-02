@@ -7,7 +7,7 @@ namespace Disruptor
 namespace Tests
 {
 
-    SequenceBarrierTestsFixture::SequenceBarrierTestsFixture()
+    void SequenceBarrierTestsFixture::SetUp()
     {
         m_ringBuffer = RingBuffer< StubEvent >::createMultiProducer([] { return StubEvent(-1); }, 64);
 

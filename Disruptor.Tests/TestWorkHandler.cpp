@@ -22,6 +22,20 @@ namespace Tests
         m_stopped = true;
     }
 
+    void TestWorkHandler::onStart()
+    {
+        m_barrier->arrive_and_wait();
+    }
+
+    void TestWorkHandler::onShutdown()
+    {
+    }
+
+    void TestWorkHandler::awaitStart()
+    {
+        m_barrier->arrive_and_wait();
+    }
+
     void TestWorkHandler::waitForAndSetFlag(std::int32_t newValue)
     {
         while (!m_stopped && std::atomic_exchange(&m_readyToProcessEvent, newValue) == newValue)

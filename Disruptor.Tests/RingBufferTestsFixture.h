@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <any>
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "Disruptor/IEventTranslator.h"
 #include "Disruptor/IEventTranslatorVararg.h"
@@ -23,15 +23,17 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct RingBufferTestsFixture
+    class RingBufferTestsFixture : public ::testing::Test
     {
+    public:
         class NoArgEventTranslator;
         class OneArgEventTranslator;
         class TestEventProcessor;
         class ThreeArgEventTranslator;
         class TwoArgEventTranslator;
 
-        RingBufferTestsFixture();
+    protected:
+        void SetUp() override;
 
         std::future< std::vector< StubEvent > > getEvents(std::int64_t initial, std::int64_t toWaitFor);
 
@@ -40,6 +42,7 @@ namespace Tests
         static void assertEmptyRingBuffer(const RingBuffer< std::any >& ringBuffer);
 
 
+    public:
         class RingBufferEquals
         {
         public:

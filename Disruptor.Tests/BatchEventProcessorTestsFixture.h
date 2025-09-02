@@ -16,16 +16,17 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct BatchEventProcessorTestsFixture
+    class BatchEventProcessorTestsFixture : public ::testing::Test
     {
-        BatchEventProcessorTestsFixture();
+    protected:
+        void SetUp() override;
 
         std::shared_ptr< RingBuffer< StubEvent > > m_ringBuffer;
         std::shared_ptr< ISequenceBarrier > m_sequenceBarrier;
         std::shared_ptr< BatchHandlerMock< StubEvent > > m_batchHandlerMock;
         std::shared_ptr< ExceptionHandlerMock< StubEvent > > m_excpetionHandlerMock;
         std::shared_ptr< BatchEventProcessor< StubEvent > > m_batchEventProcessor;
-        CountdownEvent m_countDownEvent;
+        CountdownEvent m_countDownEvent{1};
     };
 
 } // namespace Tests

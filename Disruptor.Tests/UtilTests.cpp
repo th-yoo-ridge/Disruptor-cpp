@@ -7,30 +7,31 @@
 using namespace Disruptor;
 
 
-BOOST_AUTO_TEST_SUITE(UtilTests)
+class UtilTests : public ::testing::Test
+{
+};
 
-BOOST_AUTO_TEST_CASE(ShouldReturnNextPowerOfTwo)
+TEST_F(UtilTests, ShouldReturnNextPowerOfTwo)
 {
     auto powerOfTwo = Util::ceilingNextPowerOfTwo(1000);
 
-    BOOST_CHECK_EQUAL(1024, powerOfTwo);
+    EXPECT_EQ(1024, powerOfTwo);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldReturnExactPowerOfTwo)
+TEST_F(UtilTests, ShouldReturnExactPowerOfTwo)
 {
     auto powerOfTwo = Util::ceilingNextPowerOfTwo(1024);
 
-    BOOST_CHECK_EQUAL(1024, powerOfTwo);
+    EXPECT_EQ(1024, powerOfTwo);
 }
 
-BOOST_AUTO_TEST_CASE(ShouldReturnMinimumSequence)
+TEST_F(UtilTests, ShouldReturnMinimumSequence)
 {
-    BOOST_CHECK_EQUAL(4L, Util::getMinimumSequence({ std::make_shared< Sequence >(11), std::make_shared< Sequence >(4), std::make_shared< Sequence >(13) }));
+    EXPECT_EQ(4L, Util::getMinimumSequence({ std::make_shared< Sequence >(11), std::make_shared< Sequence >(4), std::make_shared< Sequence >(13) }));
 }
 
-BOOST_AUTO_TEST_CASE(ShouldReturnLongMaxWhenNoEventProcessors)
+TEST_F(UtilTests, ShouldReturnLongMaxWhenNoEventProcessors)
 {
-    BOOST_CHECK_EQUAL(std::numeric_limits< std::int64_t >::max(), Util::getMinimumSequence({ }));
+    EXPECT_EQ(std::numeric_limits< std::int64_t >::max(), Util::getMinimumSequence({ }));
 }
 
-BOOST_AUTO_TEST_SUITE_END()

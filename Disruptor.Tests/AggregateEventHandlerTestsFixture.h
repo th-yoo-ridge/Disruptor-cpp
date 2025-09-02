@@ -13,9 +13,10 @@ namespace Disruptor
 namespace Tests
 {
 
-    struct AggregateEventHandlerTestsFixture
+    class AggregateEventHandlerTestsFixture : public ::testing::Test
     {
-        AggregateEventHandlerTestsFixture();
+    protected:
+        void SetUp() override;
 
         std::shared_ptr< LifecycleAwareEventHandlerMock< std::int32_t > > m_eventHandlerMock1;
         std::shared_ptr< LifecycleAwareEventHandlerMock< std::int32_t > > m_eventHandlerMock2;

@@ -8,16 +8,16 @@
 using namespace Disruptor;
 
 
-BOOST_AUTO_TEST_SUITE(IgnoreExceptionHandlerTests)
+class IgnoreExceptionHandlerTests : public ::testing::Test
+{
+};
 
-BOOST_AUTO_TEST_CASE(ShouldIgnoreException)
+TEST_F(IgnoreExceptionHandlerTests, ShouldIgnoreException)
 {
     auto causeException = ArgumentException("IgnoreExceptionHandler.ShouldIgnoreException");
     auto evt = Tests::StubEvent(0);
 
     auto exceptionHandler = std::make_shared< IgnoreExceptionHandler< Tests::StubEvent> >();
 
-    BOOST_CHECK_NO_THROW(exceptionHandler->handleEventException(causeException, 0L, evt));
+    EXPECT_NO_THROW(exceptionHandler->handleEventException(causeException, 0L, evt));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

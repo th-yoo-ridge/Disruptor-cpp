@@ -7,7 +7,7 @@ namespace Disruptor
 namespace Tests
 {
 
-    AggregateEventHandlerTestsFixture::AggregateEventHandlerTestsFixture()
+    void AggregateEventHandlerTestsFixture::SetUp()
     {
         m_eventHandlerMock1 = std::make_shared< testing::NiceMock< LifecycleAwareEventHandlerMock< std::int32_t > > >();
         m_eventHandlerMock2 = std::make_shared< testing::NiceMock< LifecycleAwareEventHandlerMock< std::int32_t > > >();

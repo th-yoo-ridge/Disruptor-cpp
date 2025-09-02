@@ -10,9 +10,8 @@ using namespace Disruptor;
 using namespace Disruptor::Tests;
 
 
-BOOST_AUTO_TEST_SUITE(AggregateEventHandlerTests)
 
-BOOST_FIXTURE_TEST_CASE(ShouldCallOnEventInSequence, AggregateEventHandlerTestsFixture)
+TEST_F(AggregateEventHandlerTestsFixture, ShouldCallOnEventInSequence)
 {
     auto evt = 7;
     const std::int64_t sequence = 3;
@@ -25,7 +24,7 @@ BOOST_FIXTURE_TEST_CASE(ShouldCallOnEventInSequence, AggregateEventHandlerTestsF
     m_aggregateEventHandler->onEvent(evt, sequence, endOfBatch);
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldCallOnStartInSequence, AggregateEventHandlerTestsFixture)
+TEST_F(AggregateEventHandlerTestsFixture, ShouldCallOnStartInSequence)
 {
     EXPECT_CALL(*m_eventHandlerMock1, onStart()).Times(1);
     EXPECT_CALL(*m_eventHandlerMock2, onStart()).Times(1);
@@ -34,7 +33,7 @@ BOOST_FIXTURE_TEST_CASE(ShouldCallOnStartInSequence, AggregateEventHandlerTestsF
     m_aggregateEventHandler->onStart();
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldCallOnShutdownInSequence, AggregateEventHandlerTestsFixture)
+TEST_F(AggregateEventHandlerTestsFixture, ShouldCallOnShutdownInSequence)
 {
     EXPECT_CALL(*m_eventHandlerMock1, onShutdown()).Times(1);
     EXPECT_CALL(*m_eventHandlerMock2, onShutdown()).Times(1);
@@ -43,14 +42,13 @@ BOOST_FIXTURE_TEST_CASE(ShouldCallOnShutdownInSequence, AggregateEventHandlerTes
     m_aggregateEventHandler->onShutdown();
 }
 
-BOOST_FIXTURE_TEST_CASE(ShouldHandleEmptyListOfEventHandlers, AggregateEventHandlerTestsFixture)
+TEST_F(AggregateEventHandlerTestsFixture, ShouldHandleEmptyListOfEventHandlers)
 {
     auto newAggregateEventHandler = std::make_shared< AggregateEventHandler< std::int32_t > >();
 
     auto v = 7;
-    BOOST_CHECK_NO_THROW(newAggregateEventHandler->onEvent(v, 0, true));
-    BOOST_CHECK_NO_THROW(newAggregateEventHandler->onStart());
-    BOOST_CHECK_NO_THROW(newAggregateEventHandler->onShutdown());
+    EXPECT_NO_THROW(newAggregateEventHandler->onEvent(v, 0, true));
+    EXPECT_NO_THROW(newAggregateEventHandler->onStart());
+    EXPECT_NO_THROW(newAggregateEventHandler->onShutdown());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
